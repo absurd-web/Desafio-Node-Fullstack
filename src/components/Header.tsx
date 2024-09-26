@@ -15,7 +15,7 @@ import Logo from '../assets/OnOnetree-logo-branco.svg'
 import CkChevronDown from '../assets/icons/CkChevronDown.svg'
 import { Link, useLocation } from 'react-router-dom'
 
-const pages = ['/', 'Eventos', 'Locais']
+const pages = ['', 'Eventos', 'Locais']
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
 
 function Header() {
@@ -79,7 +79,7 @@ function Header() {
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography sx={{ textAlign: 'center' }}>
-                    {page === '/' ? 'Home' : page}
+                    {page === '' ? 'Home' : page}
                   </Typography>
                 </MenuItem>
               ))}
@@ -102,13 +102,15 @@ function Header() {
                   my: 2,
                   color: 'secondary.main',
                   textDecoration:
-                    location === page.toLowerCase() ? 'underline' : 'none',
+                    location === '/' + page.toLowerCase()
+                      ? 'underline'
+                      : 'none',
                   fontWeight: location === page.toLowerCase() ? 700 : 'inherit',
                   display: 'block',
                   textTransform: 'none',
                 }}
               >
-                {page === '/' ? 'Home' : page}
+                {page === '' ? 'Home' : page}
               </Button>
             ))}
           </Box>

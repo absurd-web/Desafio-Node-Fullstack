@@ -68,7 +68,7 @@ const HomeTableWidget: React.FC<HomeTableWidgetProps> = ({
             Ver todos
           </Link>
         </Box>
-        <DataTable tableMode={tableMode} />
+        <DataTable tableMode={tableMode} simple />
       </Container>
     </Grid>
   )
