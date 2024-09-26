@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import {
   TableContainer,
   Table,
@@ -9,25 +10,29 @@ import {
   Button,
   TableHead,
   Box,
+  Menu,
+  MenuItem,
+  lighten,
+  Typography,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { useState } from 'react'
 
 interface BaseRow {
   id: number
   nome: string
+  endereco: string
+  portoes: string
 }
 
 interface LocalRow extends BaseRow {
   cidade_uf: string
-  endereco: string
-  portoes: string
   atualizacao: string
 }
 
 interface EventoRow extends BaseRow {
   tipo: string
   local: string
+  data: string
 }
 
 type TableMode = 'local' | 'evento'
@@ -40,6 +45,26 @@ interface Column {
 interface DataTableProps {
   tableMode: TableMode
   simple?: boolean
+}
+
+const ROWS_POR_PAGINA = 5
+
+const columns: Record<TableMode, Column[]> = {
+  local: [
+    { field: 'nome', headerName: 'Nome do Local' },
+    { field: 'endereco', headerName: 'Endereço' },
+    { field: 'cidade_uf', headerName: 'Cidade e Estado' },
+    { field: 'portoes', headerName: 'Portões cadastrados' },
+    { field: 'atualizacao', headerName: 'Atualização' },
+  ],
+  evento: [
+    { field: 'nome', headerName: 'Nome' },
+    { field: 'tipo', headerName: 'Tipo' },
+    { field: 'local', headerName: 'Local associado' },
+    { field: 'endereco', headerName: 'Endereço' },
+    { field: 'portoes', headerName: 'Portões cadastrados' },
+    { field: 'data', headerName: 'Data' },
+  ],
 }
 
 const localRows: LocalRow[] = [
@@ -94,45 +119,134 @@ const localRows: LocalRow[] = [
 ]
 
 const eventoRows: EventoRow[] = [
-  { id: 1, nome: 'Final Copa América', tipo: 'Futebol', local: 'Morumbis' },
+  {
+    id: 1,
+    nome: 'Final Copa América',
+    tipo: 'Futebol',
+    local: 'Morumbis',
+    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
+    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
+    data: '05/10/23',
+  },
   {
     id: 2,
     nome: 'Semi Final Copa América',
     tipo: 'Futebol',
     local: 'Morumbis',
+    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
+    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
+    data: '05/10/23',
   },
   {
     id: 3,
     nome: 'Love on tour - Harry Styles',
     tipo: 'Show',
     local: 'Morumbis',
+    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
+    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
+    data: '05/10/23',
+  },
+  {
+    id: 4,
+    nome: 'Love on tour - Harry Styles',
+    tipo: 'Show',
+    local: 'Morumbis',
+    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
+    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
+    data: '05/10/23',
+  },
+  {
+    id: 5,
+    nome: 'Love on tour - Harry Styles',
+    tipo: 'Show',
+    local: 'Morumbis',
+    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
+    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
+    data: '05/10/23',
+  },
+  {
+    id: 6,
+    nome: 'Love on tour - Harry Styles',
+    tipo: 'Show',
+    local: 'Morumbis',
+    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
+    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
+    data: '05/10/23',
   },
 ]
 
-const columns: Record<TableMode, Column[]> = {
-  local: [
-    { field: 'nome', headerName: 'Nome do Local' },
-    { field: 'endereco', headerName: 'Endereço' },
-    { field: 'cidade_uf', headerName: 'Cidade e Estado' },
-    { field: 'portoes', headerName: 'Portões cadastrados' },
-    { field: 'atualizacao', headerName: 'Atualização' },
-  ],
-  evento: [
-    { field: 'nome', headerName: 'Nome' },
-    { field: 'tipo', headerName: 'Tipo' },
-    { field: 'local', headerName: 'Local' },
-  ],
+const getTipoCellStyle = (tipo: string, palette: any) => {
+  const baseStyle = {
+    width: 'fit-content',
+    textAlign: 'center',
+    borderRadius: '6px',
+    px: '6px',
+    fontWeight: 'bold',
+  }
+
+  return tipo === 'Futebol'
+    ? {
+        ...baseStyle,
+        backgroundColor: palette.onSupportBlue.main,
+        color: palette.onSecondary.main,
+      }
+    : {
+        ...baseStyle,
+        backgroundColor: palette.warningSuport.main,
+        color: palette.secondary.main,
+      }
 }
 
-const BotoesPaginacao = ({
-  totalPaginas,
-  paginaAtual,
-  onPageChange,
-}: {
+const RowMenu: React.FC = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const { palette } = useTheme()
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  return (
+    <>
+      <Button sx={{ m: 0, p: 0, minWidth: 0 }} onClick={handleClick}>
+        <MoreVertIcon style={{ color: palette.supportBlue.main }} />
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        sx={{
+          '& .MuiMenu-paper': { bgcolor: palette.surface2.main },
+          '& .MuiList-root': { p: 0 },
+        }}
+      >
+        {['Edit', 'Apagar'].map((action) => (
+          <MenuItem
+            key={action}
+            onClick={handleClose}
+            sx={{
+              '&:hover': {
+                backgroundColor: lighten(palette.surface2.main, 0.05),
+              },
+              color: 'primary.main',
+            }}
+          >
+            {action}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  )
+}
+
+const BotoesPaginacao: React.FC<{
   totalPaginas: number
   paginaAtual: number
   onPageChange: (page: number) => void
-}) => {
+}> = ({ totalPaginas, paginaAtual, onPageChange }) => {
   if (totalPaginas <= 1) return null
 
   return (
@@ -140,14 +254,13 @@ const BotoesPaginacao = ({
       {[...Array(totalPaginas)].map((_, i) => (
         <Button
           key={i}
-          type="button"
+          onClick={() => onPageChange(i + 1)}
           sx={{
             minWidth: 0,
             py: '4px',
             px: '12px',
             bgcolor: i + 1 === paginaAtual ? 'background.default' : 'inherit',
           }}
-          onClick={() => onPageChange(i + 1)}
         >
           {i + 1}
         </Button>
@@ -156,161 +269,126 @@ const BotoesPaginacao = ({
   )
 }
 
-const SimpleTable = ({
-  rows,
-  columns,
-  palette,
-}: {
+/**
+ * Componente de conteúdo da tabela que renderiza linhas e colunas com base nos dados fornecidos.
+ *
+ * @param rows - Array de objetos que representam as linhas da tabela. Pode ser do tipo `LocalRow` ou `EventoRow`.
+ * @param columns - Array de objetos que representam as colunas da tabela.
+ * @param tableMode - Modo da tabela que pode ser 'local' ou 'evento'.
+ * @param simple - (Opcional) Booleano que indica se a tabela deve ser renderizada em modo simples. O padrão é `false`.
+ *
+ * @returns JSX.Element - O conteúdo da tabela renderizado.
+ */
+const TableContent: React.FC<{
   rows: (LocalRow | EventoRow)[]
   columns: Column[]
-  palette: any
-}) => (
-  <TableContainer sx={{ overflow: 'hidden' }}>
-    <Table
-      sx={{
-        [`& .${tableCellClasses.root}`]: {
-          borderBottom: 'none',
-          color: 'primary',
-        },
-      }}
-    >
-      <TableBody>
-        {rows.slice(0, 3).map((row) => (
-          <TableRow
-            key={row.id}
-            sx={{
-              '& td': {
-                overflow: 'hidden',
-                maxWidth: '5vw',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                color: 'primary.main',
-                pr: 1,
-              },
-              '&:nth-of-type(odd)': {
-                backgroundColor: palette.background.default,
-              },
-            }}
-          >
-            {columns.slice(0, 3).map((column) => (
-              <TableCell key={column.field}>
-                {row[column.field as keyof typeof row]}
-              </TableCell>
-            ))}
-            <TableCell align="right">
-              <Button sx={{ m: 0, p: 0, minWidth: 0 }}>
-                <MoreVertIcon style={{ color: palette.supportBlue.main }} />
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-)
+  tableMode: TableMode
+  simple?: boolean
+}> = ({ rows, columns, tableMode, simple = false }) => {
+  const { palette } = useTheme()
+  const displayColumns = simple
+    ? tableMode === 'local'
+      ? [columns[0], columns[1], columns[3]]
+      : columns.slice(0, 3)
+    : columns
 
-const FullTable = ({
-  rows,
-  columns,
-  palette,
-}: {
-  rows: (LocalRow | EventoRow)[]
-  columns: Column[]
-  palette: any
-}) => (
-  <TableContainer sx={{ overflow: 'hidden', minHeight: '340px' }}>
-    <Table
-      sx={{
-        [`& .${tableCellClasses.root}`]: {
-          borderBottom: 'none',
-          color: 'primary',
-        },
-      }}
-    >
-      <TableHead>
-        <TableRow sx={{ '& th': { color: 'primary.main' } }}>
-          {columns.map((column) => (
-            <TableCell key={column.field}>{column.headerName}</TableCell>
+  return (
+    <TableContainer sx={simple ? {} : { minHeight: '340px' }}>
+      <Table
+        sx={{
+          [`& .${tableCellClasses.root}`]: {
+            maxWidth: '100px',
+            borderBottom: 'none',
+            color: simple ? 'primary.main' : palette.onSupportBlue.main,
+          },
+        }}
+      >
+        {!simple && (
+          <TableHead>
+            <TableRow sx={{ '& th': { color: 'primary.main' } }}>
+              {columns.map((column) => (
+                <TableCell key={column.field}>{column.headerName}</TableCell>
+              ))}
+              <TableCell />
+            </TableRow>
+          </TableHead>
+        )}
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.id}
+              sx={{
+                '&:nth-of-type(odd)': {
+                  backgroundColor: palette.background.default,
+                },
+              }}
+            >
+              {displayColumns.map((column) => (
+                <TableCell key={column.field}>
+                  <Typography
+                    noWrap
+                    sx={
+                      tableMode === 'evento' &&
+                      column.field === 'tipo' &&
+                      'tipo' in row
+                        ? getTipoCellStyle(row.tipo, palette)
+                        : {}
+                    }
+                  >
+                    {row[column.field as keyof typeof row]}
+                  </Typography>
+                </TableCell>
+              ))}
+              <TableCell align="right">
+                <RowMenu />
+              </TableCell>
+            </TableRow>
           ))}
-          <TableCell />
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row) => (
-          <TableRow
-            key={row.id}
-            sx={{
-              '& td': {
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                color: 'primary.main',
-                pr: 1,
-              },
-              '&:nth-of-type(odd)': {
-                backgroundColor: palette.background.default,
-              },
-            }}
-          >
-            {columns.map((column) => (
-              <TableCell key={column.field}>
-                {row[column.field as keyof typeof row]}
-              </TableCell>
-            ))}
-            <TableCell align="right">
-              <Button sx={{ m: 0, p: 0, minWidth: 0 }}>
-                <MoreVertIcon style={{ color: palette.supportBlue.main }} />
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-)
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
+}
 
-export default function DataTable({
-  tableMode,
-  simple = false,
-}: DataTableProps) {
-  const rows = tableMode === 'local' ? localRows : eventoRows
+/**
+ * Componente DataTable.
+ *
+ * @param {DataTableProps} props - As propriedades do componente.
+ * @param {'local' | 'evento'} props.tableMode - Modo da tabela, pode ser 'local' ou 'evento'.
+ * @param {boolean} [props.simple=false] - Define se a tabela deve ser exibida em modo simples.
+ *
+ * @returns {JSX.Element} O componente DataTable.
+ *
+ * O DataTable exibe uma tabela com dados paginados. Se o modo simples estiver ativado,
+ * apenas as três primeiras linhas serão exibidas. Caso contrário, a tabela exibirá as
+ * linhas de acordo com a paginação.
+ */
+const DataTable: React.FC<DataTableProps> = ({ tableMode, simple = false }) => {
   const [paginaAtual, setPaginaAtual] = useState(1)
-  const porPagina = 5
-  const totalPaginas = Math.ceil(rows.length / porPagina)
-  const startIndex = porPagina * (paginaAtual - 1)
-  const endIndex = startIndex + porPagina
-
-  const handleMudarPagina = (index: number) => {
-    setPaginaAtual(index)
-  }
-
-  const rowsFiltrados = rows.slice(startIndex, endIndex)
-
-  const theme = useTheme()
-  const palette = theme.palette
+  const rows = tableMode === 'local' ? localRows : eventoRows
+  const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)
+  const rowsFiltrados = rows.slice(
+    ROWS_POR_PAGINA * (paginaAtual - 1),
+    ROWS_POR_PAGINA * paginaAtual
+  )
 
   return (
     <>
-      {simple ? (
-        <SimpleTable
-          rows={rows}
-          columns={columns[tableMode]}
-          palette={palette}
+      <TableContent
+        rows={simple ? rows.slice(0, 3) : rowsFiltrados}
+        columns={columns[tableMode]}
+        tableMode={tableMode}
+        simple={simple}
+      />
+      {!simple && (
+        <BotoesPaginacao
+          totalPaginas={totalPaginas}
+          paginaAtual={paginaAtual}
+          onPageChange={setPaginaAtual}
         />
-      ) : (
-        <>
-          <FullTable
-            rows={rowsFiltrados}
-            columns={columns[tableMode]}
-            palette={palette}
-          />
-          <BotoesPaginacao
-            totalPaginas={totalPaginas}
-            paginaAtual={paginaAtual}
-            onPageChange={handleMudarPagina}
-          />
-        </>
       )}
     </>
   )
 }
+
+export default DataTable

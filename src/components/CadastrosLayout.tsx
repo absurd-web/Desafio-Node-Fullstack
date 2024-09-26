@@ -13,8 +13,10 @@ import {
 import CkSearch from '../assets/icons/CkSearch.svg?react'
 import '../styles/CadastrosLayout.css'
 import DataTable from './DataTable'
+import { useLocation } from 'react-router-dom'
 
 export default function CadastrosLayout() {
+  const location = useLocation().pathname
   const palette = useTheme().palette
   return (
     <Grid component="main" container spacing={3} size={12}>
@@ -29,17 +31,19 @@ export default function CadastrosLayout() {
             href="/material-ui/react-breadcrumbs/"
             aria-current="page"
           >
-            Locais
+            {location === '/locais' ? 'Locais' : 'Eventos'}
           </Link>
         </Breadcrumbs>
       </Grid>
       <Grid size={12}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="h5" color="primary">
-            Locais
+            {location === '/locais' ? 'Locais' : 'Eventos'}
           </Typography>
           <Typography color="primary" sx={{ fontSize: '14px' }}>
-            Confira a lista de todo os locais cadastrados
+            {location === '/locais'
+              ? 'Confira a lista de todo os locais cadastrados'
+              : 'Confira a lista de todo os eventos cadastrados'}
           </Typography>
         </Box>
       </Grid>
@@ -52,7 +56,11 @@ export default function CadastrosLayout() {
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Input
-              placeholder="Pesquise por nome do local"
+              placeholder={
+                location === '/locais'
+                  ? 'Pesquise por nome do local'
+                  : 'Pesquise por nome do evento'
+              }
               type="search"
               size="small"
               sx={{
@@ -85,10 +93,10 @@ export default function CadastrosLayout() {
                 maxHeight: '40px',
               }}
             >
-              Adicionar local
+              {location === '/locais' ? 'Adicionar local' : 'Adicionar evento'}
             </Button>
           </Box>
-          <DataTable tableMode="local" />
+          <DataTable tableMode={location === '/locais' ? 'local' : 'evento'} />
         </Container>
       </Grid>
     </Grid>

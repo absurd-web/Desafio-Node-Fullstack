@@ -32,7 +32,7 @@ const theme = createTheme({
     warning: { main: '#F79E1B' },
     error: { main: '#CD2C19' },
     successSuport: { main: '#2F3B28' },
-    warningSuport: { main: '#9B671C' },
+    warningSuport: { main: '#61461F' },
     errorSuport: { main: '#461527' },
   },
   typography: { fontFamily: 'Open Sans, sans-serif' },
