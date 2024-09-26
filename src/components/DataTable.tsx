@@ -45,6 +45,7 @@ interface Column {
 interface DataTableProps {
   tableMode: TableMode
   simple?: boolean
+  searchQuery?: string
 }
 
 const ROWS_POR_PAGINA = 5
@@ -356,6 +357,7 @@ const TableContent: React.FC<{
  * @param {DataTableProps} props - As propriedades do componente.
  * @param {'local' | 'evento'} props.tableMode - Modo da tabela, pode ser 'local' ou 'evento'.
  * @param {boolean} [props.simple=false] - Define se a tabela deve ser exibida em modo simples.
+ * @param {string} [props.searchQuery] - A string de busca para filtrar as linhas da tabela.
  *
  * @returns {JSX.Element} O componente DataTable.
  *
@@ -363,19 +365,38 @@ const TableContent: React.FC<{
  * apenas as três primeiras linhas serão exibidas. Caso contrário, a tabela exibirá as
  * linhas de acordo com a paginação.
  */
-const DataTable: React.FC<DataTableProps> = ({ tableMode, simple = false }) => {
+const DataTable: React.FC<DataTableProps> = ({
+  tableMode,
+  simple = false,
+  searchQuery,
+}) => {
   const [paginaAtual, setPaginaAtual] = useState(1)
   const rows = tableMode === 'local' ? localRows : eventoRows
   const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)
-  const rowsFiltrados = rows.slice(
+  /* Pesquisa por nome */
+  const regex = searchQuery ? new RegExp(searchQuery, 'i') : null
+  const rowsFiltrados = rows.filter((row) => {
+    if (!regex) return true
+    return regex.test(row.nome)
+  })
+  const totalResultados = rowsFiltrados.length
+  const rowsPaginados = rowsFiltrados.slice(
     ROWS_POR_PAGINA * (paginaAtual - 1),
     ROWS_POR_PAGINA * paginaAtual
   )
 
   return (
     <>
+      {searchQuery && (
+        <Typography
+          sx={{ color: 'primary.main', fontStyle: 'italic', fontSize: '14px' }}
+        >
+          {totalResultados.toString().padStart(2, '0')} Resultados encontrados
+          para "{searchQuery}"
+        </Typography>
+      )}
       <TableContent
-        rows={simple ? rows.slice(0, 3) : rowsFiltrados}
+        rows={simple ? rows.slice(0, 3) : rowsPaginados}
         columns={columns[tableMode]}
         tableMode={tableMode}
         simple={simple}

@@ -14,8 +14,10 @@ import CkSearch from '../assets/icons/CkSearch.svg?react'
 import '../styles/CadastrosLayout.css'
 import DataTable from './DataTable'
 import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
 
 export default function CadastrosLayout() {
+  const [searchQuery, setSearchQuery] = useState('')
   const location = useLocation().pathname
   const palette = useTheme().palette
   return (
@@ -56,6 +58,8 @@ export default function CadastrosLayout() {
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Input
+              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
               placeholder={
                 location === '/locais'
                   ? 'Pesquise por nome do local'
@@ -96,7 +100,10 @@ export default function CadastrosLayout() {
               {location === '/locais' ? 'Adicionar local' : 'Adicionar evento'}
             </Button>
           </Box>
-          <DataTable tableMode={location === '/locais' ? 'local' : 'evento'} />
+          <DataTable
+            searchQuery={searchQuery}
+            tableMode={location === '/locais' ? 'local' : 'evento'}
+          />
         </Container>
       </Grid>
     </Grid>
