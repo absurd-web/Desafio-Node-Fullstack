@@ -4,8 +4,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import useTheme from '@mui/material/styles/useTheme'
-import { Button, Divider, FormGroup, InputLabel } from '@mui/material'
-import CustomInput from './CustomInput'
+import { Button, Divider, FormGroup, Input, InputLabel } from '@mui/material'
 
 interface AddEditLayoutProps {
   itemTipo: 'locais' | 'eventos'
@@ -52,37 +51,34 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <InputLabel htmlFor="novo-nome">
                   <Typography color="primary">Nome do local*</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-nome"
                   placeholder="Informe o nome do local"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-apelido">
                   <Typography color="primary">Apelido</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-apelido"
                   placeholder="Informe um apelido (caso exista)"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-tipo">
                   <Typography color="primary">Selecione um tipo*</Typography>
                 </InputLabel>
-                <CustomInput
-                  id="novo-tipo"
-                  placeholder="Selecione um tipo"
-                ></CustomInput>
+                <Input id="novo-tipo" placeholder="Selecione um tipo"></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-cnpj">
                   <Typography color="primary">CNPJ</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-cnpj"
                   placeholder="Informe o CNPJ (caso conheça)"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
@@ -94,46 +90,40 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <InputLabel htmlFor="novo-cidade">
                   <Typography color="primary">Cidade*</Typography>
                 </InputLabel>
-                <CustomInput
-                  id="novo-cidade"
-                  placeholder="Informe a Cidade"
-                ></CustomInput>
+                <Input id="novo-cidade" placeholder="Informe a Cidade"></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-estado">
                   <Typography color="primary">Estado</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-estado"
                   placeholder="Selecione um estado"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-cep">
                   <Typography color="primary">CEP*</Typography>
                 </InputLabel>
-                <CustomInput
-                  id="novo-cep"
-                  placeholder="Informe o CEP"
-                ></CustomInput>
+                <Input id="novo-cep" placeholder="Informe o CEP"></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-endereco">
                   <Typography color="primary">Endereço*</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-endereco"
                   placeholder="Informe o Endereço"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-complemento">
                   <Typography color="primary">Complemento</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-complemento"
                   placeholder="Informe o complemento"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
@@ -145,19 +135,16 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <InputLabel htmlFor="novo-email">
                   <Typography color="primary">E-mail*</Typography>
                 </InputLabel>
-                <CustomInput
-                  id="novo-email"
-                  placeholder="Informe um e-mail"
-                ></CustomInput>
+                <Input id="novo-email" placeholder="Informe um e-mail"></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-telefone">
                   <Typography color="primary">Telefone</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-telefone"
                   placeholder="Informe um telefone"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
@@ -171,19 +158,16 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <InputLabel htmlFor="novo-email">
                   <Typography color="primary">Cadastre as entradas</Typography>
                 </InputLabel>
-                <CustomInput
-                  id="novo-email"
-                  placeholder="Informe um e-mail"
-                ></CustomInput>
+                <Input id="novo-email" placeholder="Informe um e-mail"></Input>
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-telefone">
                   <Typography color="primary">Cadastre as catracas</Typography>
                 </InputLabel>
-                <CustomInput
+                <Input
                   id="novo-telefone"
                   placeholder="Informe um telefone"
-                ></CustomInput>
+                ></Input>
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />

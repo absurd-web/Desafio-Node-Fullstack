@@ -39,6 +39,20 @@ const theme = createTheme({
   typography: { fontFamily: 'Open Sans, sans-serif' },
   components: {
     MuiBreadcrumbs: { styleOverrides: { separator: { color: '#EBF0F9' } } },
+    MuiInput: {
+      styleOverrides: {
+        root: {
+          width: '100%',
+        },
+        input: {
+          '& ::placeholder': { color: '#808FA9' },
+          color: '#EBF0F9',
+          padding: '0.8rem 1rem',
+          borderRadius: '4px',
+          backgroundColor: '#333B49',
+        },
+      },
+    },
   },
 })
 

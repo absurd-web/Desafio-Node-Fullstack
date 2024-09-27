@@ -64,9 +64,12 @@ export default function CadastrosLayout({
                 '& .MuiInputBase-input::placeholder': {
                   color: palette.greyBlue.main,
                 },
+                '& .MuiInputBase-input': {
+                  color: palette.greyBlue.main,
+                  p: 0,
+                },
+                p: 1,
                 width: '40%',
-                py: 0,
-                px: 1,
                 borderRadius: '4px',
                 bgcolor: 'background.default',
               }}
