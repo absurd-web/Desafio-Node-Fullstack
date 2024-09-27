@@ -1,6 +1,4 @@
-import Breadcrumbs from '@mui/material/Breadcrumbs'
 import Grid from '@mui/material/Grid2'
-import Link from '@mui/material/Link'
 import { useTheme } from '@mui/material/styles'
 import {
   Box,
@@ -14,6 +12,8 @@ import CkSearch from '../assets/icons/CkSearch.svg?react'
 import '../styles/CadastrosLayout.css'
 import DataTable from './DataTable'
 import { useState } from 'react'
+import CustomBreadcrumbs from './CustomBreadcrumbs'
+import { Link as RouterLink } from 'react-router-dom'
 
 interface CadastrosLayoutProps {
   cadastrosTipo: 'locais' | 'eventos'
@@ -27,19 +27,7 @@ export default function CadastrosLayout({
   return (
     <Grid component="main" container spacing={3} size={12}>
       <Grid size={12}>
-        <Breadcrumbs aria-label="breadcrumb" style={{ color: 'primary' }}>
-          <Link underline="hover" color="primary" href="/">
-            Home
-          </Link>
-          <Link
-            underline="hover"
-            color={palette.supportBlue.main}
-            href="/material-ui/react-breadcrumbs/"
-            aria-current="page"
-          >
-            {cadastrosTipo === 'locais' ? 'Locais' : 'Eventos'}
-          </Link>
-        </Breadcrumbs>
+        <CustomBreadcrumbs tipo={cadastrosTipo} />
       </Grid>
       <Grid size={12}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -89,6 +77,8 @@ export default function CadastrosLayout({
               }
             />
             <Button
+              component={RouterLink}
+              to={`/${cadastrosTipo}/add`}
               variant="contained"
               disableElevation
               sx={{

@@ -11,6 +11,7 @@ import GridLayout from './components/GridLayout.tsx'
 import Home from './routes/Home.tsx'
 import Eventos from './routes/Eventos.tsx'
 import Locais from './routes/Locais.tsx'
+import AddEditLayout from './components/AddEditLayout.tsx'
 
 const theme = createTheme({
   palette: {
@@ -59,12 +60,20 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: '/eventos',
+        path: 'eventos',
         element: <Eventos />,
       },
       {
-        path: '/locais',
+        path: 'locais',
         element: <Locais />,
+      },
+      {
+        path: 'eventos/add',
+        element: <AddEditLayout itemTipo="eventos" />,
+      },
+      {
+        path: 'locais/add',
+        element: <AddEditLayout itemTipo="locais" />,
       },
     ],
   },
