@@ -13,12 +13,16 @@ import {
 import CkSearch from '../assets/icons/CkSearch.svg?react'
 import '../styles/CadastrosLayout.css'
 import DataTable from './DataTable'
-import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
-export default function CadastrosLayout() {
+interface CadastrosLayoutProps {
+  cadastrosTipo: 'locais' | 'eventos'
+}
+
+export default function CadastrosLayout({
+  cadastrosTipo,
+}: CadastrosLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const location = useLocation().pathname
   const palette = useTheme().palette
   return (
     <Grid component="main" container spacing={3} size={12}>
@@ -33,17 +37,17 @@ export default function CadastrosLayout() {
             href="/material-ui/react-breadcrumbs/"
             aria-current="page"
           >
-            {location === '/locais' ? 'Locais' : 'Eventos'}
+            {cadastrosTipo === 'locais' ? 'Locais' : 'Eventos'}
           </Link>
         </Breadcrumbs>
       </Grid>
       <Grid size={12}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="h5" color="primary">
-            {location === '/locais' ? 'Locais' : 'Eventos'}
+            {cadastrosTipo === 'locais' ? 'Locais' : 'Eventos'}
           </Typography>
           <Typography color="primary" sx={{ fontSize: '14px' }}>
-            {location === '/locais'
+            {cadastrosTipo === 'locais'
               ? 'Confira a lista de todo os locais cadastrados'
               : 'Confira a lista de todo os eventos cadastrados'}
           </Typography>
@@ -61,7 +65,7 @@ export default function CadastrosLayout() {
               onChange={(e) => setSearchQuery(e.target.value)}
               value={searchQuery}
               placeholder={
-                location === '/locais'
+                cadastrosTipo === 'locais'
                   ? 'Pesquise por nome do local'
                   : 'Pesquise por nome do evento'
               }
@@ -97,12 +101,14 @@ export default function CadastrosLayout() {
                 maxHeight: '40px',
               }}
             >
-              {location === '/locais' ? 'Adicionar local' : 'Adicionar evento'}
+              {cadastrosTipo === 'locais'
+                ? 'Adicionar local'
+                : 'Adicionar evento'}
             </Button>
           </Box>
           <DataTable
             searchQuery={searchQuery}
-            tableMode={location === '/locais' ? 'local' : 'evento'}
+            tableMode={cadastrosTipo === 'locais' ? 'local' : 'evento'}
           />
         </Container>
       </Grid>
