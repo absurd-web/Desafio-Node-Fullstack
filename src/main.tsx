@@ -13,11 +13,22 @@ import Eventos from './routes/Eventos.tsx'
 import Locais from './routes/Locais.tsx'
 import AddEditLayout from './components/AddEditLayout.tsx'
 import { SnackbarProvider } from './contexts/SnackbarContext.tsx'
-import { getPlaceholder } from './utils/getPlaceholder.ts'
+import { getPlaceholder, getPlaceholderItem } from './utils/getPlaceholder.ts'
+import type { LoaderFunctionArgs } from 'react-router-dom'
 
 async function placeholderLoader() {
   const { locais, eventos } = getPlaceholder()
   return { locais, eventos }
+}
+
+async function placeholderLocalLoader({ params }: LoaderFunctionArgs) {
+  const item = getPlaceholderItem(params.id as string, 'local')
+  return item
+}
+
+async function placeholderEventoLoader({ params }: LoaderFunctionArgs) {
+  const item = getPlaceholderItem(params.id as string, 'evento')
+  return item
 }
 
 const theme = createTheme({
@@ -105,6 +116,16 @@ const router = createBrowserRouter([
       {
         path: 'locais/add',
         element: <AddEditLayout itemTipo="locais" />,
+      },
+      {
+        path: 'eventos/edit/:id',
+        element: <AddEditLayout itemTipo="eventos" />,
+        loader: placeholderEventoLoader,
+      },
+      {
+        path: 'locais/edit/:id',
+        element: <AddEditLayout itemTipo="locais" />,
+        loader: placeholderLocalLoader,
       },
     ],
   },

@@ -16,7 +16,7 @@ import {
   Typography,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { useRouteLoaderData } from 'react-router-dom'
+import { useRouteLoaderData, Link as RouterLink } from 'react-router-dom'
 import { Local, Evento } from '../utils/getPlaceholder'
 type TableMode = 'local' | 'evento'
 
@@ -38,7 +38,7 @@ const columns: Record<TableMode, Column[]> = {
     { field: 'nome', headerName: 'Nome do Local' },
     { field: 'endereco', headerName: 'Endereço' },
     { field: 'cidade_uf', headerName: 'Cidade e Estado' },
-    { field: 'portoes', headerName: 'Portões cadastrados' },
+    { field: 'entradas', headerName: 'Portões cadastrados' },
     { field: 'atualizacao', headerName: 'Atualização' },
   ],
   evento: [
@@ -46,7 +46,7 @@ const columns: Record<TableMode, Column[]> = {
     { field: 'tipo', headerName: 'Tipo' },
     { field: 'local', headerName: 'Local associado' },
     { field: 'endereco', headerName: 'Endereço' },
-    { field: 'portoes', headerName: 'Portões cadastrados' },
+    { field: 'entradas', headerName: 'Portões cadastrados' },
     { field: 'data', headerName: 'Data' },
   ],
 }
@@ -73,7 +73,12 @@ const getTipoCellStyle = (tipo: string, palette: any) => {
       }
 }
 
-const RowMenu: React.FC = () => {
+interface RowMenuProps {
+  itemTipo: TableMode
+  id: string
+}
+
+const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, id }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { palette } = useTheme()
 
@@ -101,6 +106,8 @@ const RowMenu: React.FC = () => {
       >
         {['Edit', 'Apagar'].map((action) => (
           <MenuItem
+            component={RouterLink}
+            to={`/${itemTipo}/${action.toLowerCase()}/${id}`}
             key={action}
             onClick={handleClose}
             sx={{
@@ -211,12 +218,20 @@ const TableContent: React.FC<{
                         : {}
                     }
                   >
-                    {row[column.field as keyof typeof row]}
+                    {/* combina cidade e uf para display */}
+                    {column.field === 'cidade_uf'
+                      ? 'cidade' in row
+                        ? `${row.cidade}; ${row.uf}`
+                        : ''
+                      : /* entradas é um array, virgulas para display */
+                        column.field === 'entradas'
+                        ? (row[column.field] as string[]).join(',')
+                        : row[column.field as keyof typeof row]}
                   </Typography>
                 </TableCell>
               ))}
               <TableCell align="right">
-                <RowMenu />
+                <RowMenu itemTipo={tableMode} id={row.id} />
               </TableCell>
             </TableRow>
           ))}
