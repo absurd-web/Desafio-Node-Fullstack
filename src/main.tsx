@@ -11,6 +11,8 @@ import GridLayout from './components/GridLayout.tsx'
 import Home from './routes/Home.tsx'
 import Eventos from './routes/Eventos.tsx'
 import Locais from './routes/Locais.tsx'
+import AddEditLayout from './components/AddEditLayout.tsx'
+import { SnackbarProvider } from './contexts/SnackbarContext.tsx'
 
 const theme = createTheme({
   palette: {
@@ -20,6 +22,7 @@ const theme = createTheme({
     secondary: { main: '#FFFFFF' },
     onSupportBlue: { main: '#CAD6EC' },
     supportBlue: { main: '#6D99FB' },
+    skyBlue: { main: '#9ED0E6' },
     greyBlue: { main: '#808FA9' },
     greyBlue2: { main: '#4E4F5B' },
     attentionBackground: { main: '#2669FF' },
@@ -30,7 +33,7 @@ const theme = createTheme({
     surface2: { main: '#191E28' },
     success: { main: '#99C766' },
     warning: { main: '#F79E1B' },
-    error: { main: '#CD2C19' },
+    error: { main: '#F6285F' },
     successSuport: { main: '#2F3B28' },
     warningSuport: { main: '#61461F' },
     errorSuport: { main: '#461527' },
@@ -38,6 +41,25 @@ const theme = createTheme({
   typography: { fontFamily: 'Open Sans, sans-serif' },
   components: {
     MuiBreadcrumbs: { styleOverrides: { separator: { color: '#EBF0F9' } } },
+    MuiInput: {
+      styleOverrides: {
+        root: {
+          width: '100%',
+          backgroundColor: '#333B49',
+          padding: '0.2rem 0.5rem',
+          borderRadius: '4px',
+          '&.Mui-error': {
+            border: '1px solid #F6285F',
+            '&:before': { borderBottom: 'unset' },
+          },
+        },
+        input: {
+          '::placeholder': { color: '#808FA9', opacity: 1 },
+          color: '#EBF0F9',
+          backgroundColor: '#333B49',
+        },
+      },
+    },
   },
 })
 
@@ -47,10 +69,12 @@ const router = createBrowserRouter([
     element: (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <GridLayout>
-          <Header />
-          <Outlet />
-        </GridLayout>
+        <SnackbarProvider>
+          <GridLayout>
+            <Header />
+            <Outlet />
+          </GridLayout>
+        </SnackbarProvider>
       </ThemeProvider>
     ),
     children: [
@@ -59,12 +83,20 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: '/eventos',
+        path: 'eventos',
         element: <Eventos />,
       },
       {
-        path: '/locais',
+        path: 'locais',
         element: <Locais />,
+      },
+      {
+        path: 'eventos/add',
+        element: <AddEditLayout itemTipo="eventos" />,
+      },
+      {
+        path: 'locais/add',
+        element: <AddEditLayout itemTipo="locais" />,
       },
     ],
   },

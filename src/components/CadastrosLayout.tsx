@@ -1,6 +1,4 @@
-import Breadcrumbs from '@mui/material/Breadcrumbs'
 import Grid from '@mui/material/Grid2'
-import Link from '@mui/material/Link'
 import { useTheme } from '@mui/material/styles'
 import {
   Box,
@@ -13,37 +11,31 @@ import {
 import CkSearch from '../assets/icons/CkSearch.svg?react'
 import '../styles/CadastrosLayout.css'
 import DataTable from './DataTable'
-import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import CustomBreadcrumbs from './CustomBreadcrumbs'
+import { Link as RouterLink } from 'react-router-dom'
 
-export default function CadastrosLayout() {
+interface CadastrosLayoutProps {
+  cadastrosTipo: 'locais' | 'eventos'
+}
+
+export default function CadastrosLayout({
+  cadastrosTipo,
+}: CadastrosLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const location = useLocation().pathname
   const palette = useTheme().palette
   return (
     <Grid component="main" container spacing={3} size={12}>
       <Grid size={12}>
-        <Breadcrumbs aria-label="breadcrumb" style={{ color: 'primary' }}>
-          <Link underline="hover" color="primary" href="/">
-            Home
-          </Link>
-          <Link
-            underline="hover"
-            color={palette.supportBlue.main}
-            href="/material-ui/react-breadcrumbs/"
-            aria-current="page"
-          >
-            {location === '/locais' ? 'Locais' : 'Eventos'}
-          </Link>
-        </Breadcrumbs>
+        <CustomBreadcrumbs tipo={cadastrosTipo} />
       </Grid>
       <Grid size={12}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="h5" color="primary">
-            {location === '/locais' ? 'Locais' : 'Eventos'}
+            {cadastrosTipo === 'locais' ? 'Locais' : 'Eventos'}
           </Typography>
           <Typography color="primary" sx={{ fontSize: '14px' }}>
-            {location === '/locais'
+            {cadastrosTipo === 'locais'
               ? 'Confira a lista de todo os locais cadastrados'
               : 'Confira a lista de todo os eventos cadastrados'}
           </Typography>
@@ -61,7 +53,7 @@ export default function CadastrosLayout() {
               onChange={(e) => setSearchQuery(e.target.value)}
               value={searchQuery}
               placeholder={
-                location === '/locais'
+                cadastrosTipo === 'locais'
                   ? 'Pesquise por nome do local'
                   : 'Pesquise por nome do evento'
               }
@@ -72,9 +64,12 @@ export default function CadastrosLayout() {
                 '& .MuiInputBase-input::placeholder': {
                   color: palette.greyBlue.main,
                 },
+                '& .MuiInputBase-input': {
+                  color: palette.greyBlue.main,
+                  p: 0,
+                },
+                p: 1,
                 width: '40%',
-                py: 0,
-                px: 1,
                 borderRadius: '4px',
                 bgcolor: 'background.default',
               }}
@@ -85,6 +80,8 @@ export default function CadastrosLayout() {
               }
             />
             <Button
+              component={RouterLink}
+              to={`/${cadastrosTipo}/add`}
               variant="contained"
               disableElevation
               sx={{
@@ -97,12 +94,14 @@ export default function CadastrosLayout() {
                 maxHeight: '40px',
               }}
             >
-              {location === '/locais' ? 'Adicionar local' : 'Adicionar evento'}
+              {cadastrosTipo === 'locais'
+                ? 'Adicionar local'
+                : 'Adicionar evento'}
             </Button>
           </Box>
           <DataTable
             searchQuery={searchQuery}
-            tableMode={location === '/locais' ? 'local' : 'evento'}
+            tableMode={cadastrosTipo === 'locais' ? 'local' : 'evento'}
           />
         </Container>
       </Grid>
