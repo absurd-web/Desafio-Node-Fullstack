@@ -14,6 +14,7 @@ import {
   MenuItem,
   lighten,
   Typography,
+  Modal,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { useRouteLoaderData, Link as RouterLink } from 'react-router-dom'
@@ -75,11 +76,12 @@ const getTipoCellStyle = (tipo: string, palette: any) => {
 
 interface RowMenuProps {
   itemTipo: TableMode
-  id: string
+  rowData: { id: string; nome: string }
 }
 
-const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, id }) => {
+const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [openModal, setOpenModal] = useState(false)
   const { palette } = useTheme()
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -88,6 +90,14 @@ const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, id }) => {
 
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const handleOpenModal = () => {
+    setOpenModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setOpenModal(false)
   }
 
   return (
@@ -104,26 +114,95 @@ const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, id }) => {
           '& .MuiList-root': { p: 0 },
         }}
       >
-        {['Edit', 'Apagar'].map((action) => (
-          <MenuItem
-            component={RouterLink}
-            to={
-              itemTipo === 'local'
-                ? `/locais/edit/${id}`
-                : `/eventos/edit/${id}`
-            }
-            key={action}
-            onClick={handleClose}
+        <MenuItem
+          component={RouterLink}
+          to={
+            itemTipo === 'local'
+              ? `/locais/edit/${rowData.id}`
+              : `/eventos/edit/${rowData.id}`
+          }
+          onClick={handleClose}
+          sx={{
+            '&:hover': {
+              backgroundColor: lighten(palette.surface2.main, 0.05),
+            },
+            color: 'primary.main',
+          }}
+        >
+          Editar
+        </MenuItem>
+        <MenuItem
+          onClick={handleOpenModal}
+          sx={{
+            '&:hover': {
+              backgroundColor: lighten(palette.surface2.main, 0.05),
+            },
+            color: 'primary.main',
+          }}
+        >
+          Apagar
+        </MenuItem>
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box
             sx={{
-              '&:hover': {
-                backgroundColor: lighten(palette.surface2.main, 0.05),
-              },
+              position: 'absolute' as 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
               color: 'primary.main',
+              bgcolor: 'background.default',
+              borderRadius: '6px',
+              boxShadow: 24,
+              py: 2,
+              px: 2,
             }}
           >
-            {action}
-          </MenuItem>
-        ))}
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '20px',
+              }}
+            >
+              Apagar evento
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              Você tem certeza que deseja apagar o evento{' '}
+              <em>"{rowData.nome}"</em>?
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                mt: 2,
+                gap: 1,
+              }}
+            >
+              <Button
+                variant="outlined"
+                onClick={handleCloseModal}
+                sx={{ textTransform: 'none', color: 'primary.main' }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                disableElevation
+                variant="contained"
+                onClick={handleCloseModal}
+                sx={{
+                  textTransform: 'none',
+                  color: palette.onPrimary.main,
+                  bgcolor: palette.supportBlue.main,
+                }}
+              >
+                Apagar
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </Menu>
     </>
   )
@@ -235,7 +314,10 @@ const TableContent: React.FC<{
                 </TableCell>
               ))}
               <TableCell align="right">
-                <RowMenu itemTipo={tableMode} id={row.id} />
+                <RowMenu
+                  itemTipo={tableMode}
+                  rowData={{ id: row.id, nome: row.nome }}
+                />
               </TableCell>
             </TableRow>
           ))}
