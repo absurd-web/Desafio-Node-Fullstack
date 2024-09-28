@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import useTheme from '@mui/material/styles/useTheme'
 import {
-  Alert,
   Button,
   Divider,
   FormHelperText,
@@ -14,14 +13,14 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Snackbar,
-  SnackbarCloseReason,
 } from '@mui/material'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
-import CkAdd from '../assets/icons/CkAdd.svg?react'
 import { forwardRef, useState } from 'react'
 import { IMaskInput } from 'react-imask'
+import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
+import CkAdd from '../assets/icons/CkAdd.svg?react'
+import { useSnackbar } from '../contexts/SnackbarContext'
+import { useNavigate } from 'react-router-dom'
 
 interface AddEditLayoutProps {
   itemTipo: 'locais' | 'eventos'
@@ -106,8 +105,7 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
   const [catracaInput, setCatracaInput] = useState('')
   const [entradas, setEntradas] = useState<Set<string>>(new Set())
   const [catracas, setCatracas] = useState<Set<string>>(new Set())
-  const [openSuccess, setOpenSuccess] = useState(false)
-  const [openError, setOpenError] = useState(false)
+  const navigate = useNavigate()
 
   // Função para adicionar um item (entrada ou catraca)
   const handleAddItem = (
@@ -159,32 +157,16 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
     reset()
     setEntradas(new Set())
     setCatracas(new Set())
-    handleOpenAlert('success')
+    showSnackbar('Sucesso', 'um novo local foi adicionado', 'success')
+    navigate(`/${itemTipo}`)
   }
   // Função para caso algum erro ocorra devido a validação
   const onError = () => {
-    handleOpenAlert('error')
-  }
-
-  // Funções para abrir e fechar o alerta de sucesso ou erro
-  const handleOpenAlert = (type: 'success' | 'error') => {
-    if (type === 'success') {
-      setOpenSuccess(true)
-    } else setOpenError(true)
-  }
-
-  const handleCloseAlert = (
-    _event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason
-  ) => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setOpenSuccess(false)
-    setOpenError(false)
+    showSnackbar('Erro', 'não foi possível adicionar um novo local', 'error')
   }
 
   const palette = useTheme().palette
+  const { showSnackbar } = useSnackbar()
 
   return (
     <Grid component="main" container spacing={3} size={12}>
@@ -660,34 +642,6 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   </Button>
                 </Box>
               </Grid>
-              <Snackbar
-                open={openSuccess}
-                autoHideDuration={6000}
-                onClose={handleCloseAlert}
-              >
-                <Alert
-                  onClose={handleCloseAlert}
-                  severity="success"
-                  variant="filled"
-                  sx={{ width: '100%' }}
-                >
-                  Uma nova edição foi salva
-                </Alert>
-              </Snackbar>
-              <Snackbar
-                open={openError}
-                autoHideDuration={6000}
-                onClose={handleCloseAlert}
-              >
-                <Alert
-                  onClose={handleCloseAlert}
-                  severity="error"
-                  variant="filled"
-                  sx={{ width: '100%' }}
-                >
-                  Não foi possível salvar a edição
-                </Alert>
-              </Snackbar>
             </Grid>
           </Container>
         </Grid>

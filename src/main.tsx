@@ -12,6 +12,7 @@ import Home from './routes/Home.tsx'
 import Eventos from './routes/Eventos.tsx'
 import Locais from './routes/Locais.tsx'
 import AddEditLayout from './components/AddEditLayout.tsx'
+import { SnackbarProvider } from './contexts/SnackbarContext.tsx'
 
 const theme = createTheme({
   palette: {
@@ -68,10 +69,12 @@ const router = createBrowserRouter([
     element: (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <GridLayout>
-          <Header />
-          <Outlet />
-        </GridLayout>
+        <SnackbarProvider>
+          <GridLayout>
+            <Header />
+            <Outlet />
+          </GridLayout>
+        </SnackbarProvider>
       </ThemeProvider>
     ),
     children: [
