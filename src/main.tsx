@@ -21,6 +21,7 @@ const theme = createTheme({
     secondary: { main: '#FFFFFF' },
     onSupportBlue: { main: '#CAD6EC' },
     supportBlue: { main: '#6D99FB' },
+    skyBlue: { main: '#9ED0E6' },
     greyBlue: { main: '#808FA9' },
     greyBlue2: { main: '#4E4F5B' },
     attentionBackground: { main: '#2669FF' },
@@ -43,12 +44,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           width: '100%',
+          backgroundColor: '#333B49',
+          padding: '0.2rem 0.5rem',
+          borderRadius: '4px',
         },
         input: {
-          '& ::placeholder': { color: '#808FA9' },
+          '::placeholder': { color: '#808FA9', opacity: 1 },
           color: '#EBF0F9',
-          padding: '0.8rem 1rem',
-          borderRadius: '4px',
           backgroundColor: '#333B49',
         },
       },
