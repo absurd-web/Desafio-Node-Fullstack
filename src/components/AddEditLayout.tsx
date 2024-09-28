@@ -20,6 +20,7 @@ import { useState } from 'react'
 interface AddEditLayoutProps {
   itemTipo: 'locais' | 'eventos'
 }
+
 type Inputs = {
   novoNome: string
   novoApelido: string
@@ -34,75 +35,101 @@ type Inputs = {
   novoTelefone: string
 }
 
+const ESTADOS = [
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
+]
+
 export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-    reset,
-  } = useForm<Inputs>()
+  // Hooks do react-hook-form para gerenciar o formulário
+  const { register, handleSubmit, watch, setValue, reset } = useForm<Inputs>()
   const [entradaInput, setEntradaInput] = useState('')
   const [catracaInput, setCatracaInput] = useState('')
   const [entradas, setEntradas] = useState<Set<string>>(new Set())
   const [catracas, setCatracas] = useState<Set<string>>(new Set())
+
   const selectedTipo = watch('novoTipo')
   const selectedEstado = watch('novoEstado')
+
+  // Função para adicionar um item (entrada ou catraca)
   const handleAddItem = (
     itemType: 'entrada' | 'catraca',
     inputValue: string
   ) => {
     if (itemType === 'entrada') {
-      setEntradas((prevEntradas) => new Set(prevEntradas.add(inputValue)))
+      setEntradas((prev) => new Set(prev).add(inputValue))
       setEntradaInput('')
-    } else if (itemType === 'catraca') {
-      setCatracas((prevCatracas) => new Set(prevCatracas.add(inputValue)))
+    } else {
+      setCatracas((prev) => new Set(prev).add(inputValue))
       setCatracaInput('')
     }
   }
+
+  // Função para remover um item (entrada ou catraca)
   const handleRemoveItem = (
     itemType: 'entrada' | 'catraca',
     inputValue: string
   ) => {
-    if (itemType === 'entrada') {
-      setEntradas((prevEntradas) => {
-        const newEntradas = new Set(prevEntradas)
-        newEntradas.delete(inputValue)
-        return newEntradas
-      })
-    } else if (itemType === 'catraca') {
-      setCatracas((prevCatracas) => {
-        const newCatracas = new Set(prevCatracas)
-        newCatracas.delete(inputValue)
-        return newCatracas
-      })
-    }
+    const setFunction = itemType === 'entrada' ? setEntradas : setCatracas
+    setFunction((prev) => {
+      const newSet = new Set(prev)
+      newSet.delete(inputValue)
+      return newSet
+    })
   }
+
+  // Função para lidar com a tecla Enter nos inputs de entrada e catraca
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
     itemType: 'entrada' | 'catraca'
   ) => {
     if (event.key === 'Enter' && event.currentTarget.value !== '') {
       event.preventDefault()
-      if (itemType === 'entrada') {
-        handleAddItem(itemType, entradaInput)
-      } else if (itemType === 'catraca') {
-        handleAddItem(itemType, catracaInput)
-      }
+      const inputValue = itemType === 'entrada' ? entradaInput : catracaInput
+      handleAddItem(itemType, inputValue)
     }
   }
+
+  // Função para lidar com o envio do formulário
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const novoEntradas = Array.from(entradas)
-    const novoCatracas = Array.from(catracas)
-    const fullData = { ...data, novoEntradas, novoCatracas } // Combine form data with the dynamic list of items
+    const fullData = {
+      ...data,
+      novoEntradas: Array.from(entradas),
+      novoCatracas: Array.from(catracas),
+    }
     console.log(fullData)
     reset()
     setEntradas(new Set())
     setCatracas(new Set())
-    // Handle full form submission here (e.g., API call)
   }
+
   const palette = useTheme().palette
+
   return (
     <Grid component="main" container spacing={3} size={12}>
       <Grid size={3}></Grid>
@@ -266,33 +293,11 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   <MenuItem disabled value="">
                     <em>Selecione um estado</em>
                   </MenuItem>
-                  <MenuItem value="AC">AC</MenuItem>
-                  <MenuItem value="AL">AL</MenuItem>
-                  <MenuItem value="AP">AP</MenuItem>
-                  <MenuItem value="AM">AM</MenuItem>
-                  <MenuItem value="BA">BA</MenuItem>
-                  <MenuItem value="CE">CE</MenuItem>
-                  <MenuItem value="DF">DF</MenuItem>
-                  <MenuItem value="ES">ES</MenuItem>
-                  <MenuItem value="GO">GO</MenuItem>
-                  <MenuItem value="MA">MA</MenuItem>
-                  <MenuItem value="MT">MT</MenuItem>
-                  <MenuItem value="MS">MS</MenuItem>
-                  <MenuItem value="MG">MG</MenuItem>
-                  <MenuItem value="PA">PA</MenuItem>
-                  <MenuItem value="PB">PB</MenuItem>
-                  <MenuItem value="PR">PR</MenuItem>
-                  <MenuItem value="PE">PE</MenuItem>
-                  <MenuItem value="PI">PI</MenuItem>
-                  <MenuItem value="RJ">RJ</MenuItem>
-                  <MenuItem value="RN">RN</MenuItem>
-                  <MenuItem value="RS">RS</MenuItem>
-                  <MenuItem value="RO">RO</MenuItem>
-                  <MenuItem value="RR">RR</MenuItem>
-                  <MenuItem value="SC">SC</MenuItem>
-                  <MenuItem value="SP">SP</MenuItem>
-                  <MenuItem value="SE">SE</MenuItem>
-                  <MenuItem value="TO">TO</MenuItem>
+                  {ESTADOS.map((estado) => (
+                    <MenuItem key={estado} value={estado}>
+                      {estado}
+                    </MenuItem>
+                  ))}
                 </Select>
               </Grid>
               <Grid size={6}>
@@ -359,114 +364,84 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   Cadastro de entradas e catracas
                 </Typography>
               </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-entradas">
-                  <Typography color="primary">Cadastre as entradas</Typography>
-                </InputLabel>
-                <Box sx={{ display: 'flex', alignItems: 'stretch' }}>
-                  <Input
-                    id="novo-entradas"
-                    placeholder="Insira as entradas"
-                    value={entradaInput}
-                    onChange={(e) => setEntradaInput(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, 'entrada')}
-                  ></Input>
-                  <Button
-                    onClick={() => handleAddItem('entrada', entradaInput)}
-                    sx={{
-                      borderRadius: '4px',
-                      minHeight: 'unset',
-                      minWidth: 'unset',
-                      bgcolor: '#051D41',
-                    }}
-                  >
-                    <CkAdd className="icon-add" />
-                  </Button>
-                </Box>
-                <Box>
-                  {Array.from(entradas).map((entrada) => (
+              {['entrada', 'catraca'].map((itemType) => (
+                <Grid size={6} key={itemType}>
+                  <InputLabel htmlFor={`novo-${itemType}s`}>
+                    <Typography color="primary">{`Cadastre as ${itemType}s`}</Typography>
+                  </InputLabel>
+                  <Box sx={{ display: 'flex', alignItems: 'stretch' }}>
+                    <Input
+                      id={`novo-${itemType}s`}
+                      placeholder={`Insira as ${itemType}s`}
+                      value={
+                        itemType === 'entrada' ? entradaInput : catracaInput
+                      }
+                      onChange={(e) =>
+                        itemType === 'entrada'
+                          ? setEntradaInput(e.target.value)
+                          : setCatracaInput(e.target.value)
+                      }
+                      onKeyDown={(e) =>
+                        handleKeyDown(e, itemType as 'entrada' | 'catraca')
+                      }
+                    />
                     <Button
-                      onClick={() => handleRemoveItem('entrada', entrada)}
-                      disableRipple
+                      onClick={() =>
+                        handleAddItem(
+                          itemType as 'entrada' | 'catraca',
+                          itemType === 'entrada' ? entradaInput : catracaInput
+                        )
+                      }
                       sx={{
-                        textTransform: 'none',
+                        borderRadius: '4px',
+                        minHeight: 'unset',
                         minWidth: 'unset',
-                        py: 0.3,
-                        radius: '6px',
-                        bgcolor: palette.skyBlue.main,
+                        bgcolor: '#051D41',
                       }}
-                      key={entrada}
                     >
-                      <Box
+                      <CkAdd className="icon-add" />
+                    </Button>
+                  </Box>
+                  <Box>
+                    {Array.from(
+                      itemType === 'entrada' ? entradas : catracas
+                    ).map((item) => (
+                      <Button
+                        key={item}
+                        onClick={() =>
+                          handleRemoveItem(
+                            itemType as 'entrada' | 'catraca',
+                            item
+                          )
+                        }
+                        disableRipple
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          gap: 1,
+                          textTransform: 'none',
+                          minWidth: 'unset',
+                          py: 0.3,
+                          borderRadius: '6px',
+                          bgcolor: palette.skyBlue.main,
                         }}
                       >
-                        <Typography color={palette.onSecondary.main}>
-                          {entrada}
-                        </Typography>
-                        <Typography color={palette.greyBlue.main}>X</Typography>
-                      </Box>
-                    </Button>
-                  ))}
-                </Box>
-              </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-catracas">
-                  <Typography color="primary">Cadastre as catracas</Typography>
-                </InputLabel>
-                <Box sx={{ display: 'flex', alignItems: 'stretch' }}>
-                  <Input
-                    id="novo-catracas"
-                    placeholder="Insira as catracas"
-                    value={catracaInput}
-                    onChange={(e) => setCatracaInput(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, 'catraca')}
-                  ></Input>
-                  <Button
-                    onClick={() => handleAddItem('catraca', catracaInput)}
-                    sx={{
-                      borderRadius: '4px',
-                      minHeight: 'unset',
-                      minWidth: 'unset',
-                      bgcolor: '#051D41',
-                    }}
-                  >
-                    <CkAdd className="icon-add" />
-                  </Button>
-                </Box>
-                <Box>
-                  {Array.from(catracas).map((catraca) => (
-                    <Button
-                      onClick={() => handleRemoveItem('catraca', catraca)}
-                      disableRipple
-                      sx={{
-                        textTransform: 'none',
-                        minWidth: 'unset',
-                        py: 0.3,
-                        radius: '6px',
-                        bgcolor: palette.skyBlue.main,
-                      }}
-                      key={catraca}
-                    >
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          gap: 1,
-                        }}
-                      >
-                        <Typography color={palette.onSecondary.main}>
-                          {catraca}
-                        </Typography>
-                        <Typography color={palette.greyBlue.main}>X</Typography>
-                      </Box>
-                    </Button>
-                  ))}
-                </Box>
-              </Grid>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            gap: 1,
+                          }}
+                        >
+                          <Typography color={palette.onSecondary.main}>
+                            {item}
+                          </Typography>
+                          <Typography color={palette.greyBlue.main}>
+                            X
+                          </Typography>
+                        </Box>
+                      </Button>
+                    ))}
+                  </Box>
+                </Grid>
+              ))}
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
               </Grid>
