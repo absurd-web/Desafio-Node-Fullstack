@@ -7,13 +7,14 @@ import useTheme from '@mui/material/styles/useTheme'
 import {
   Button,
   Divider,
+  FormHelperText,
   Input,
   InputBaseComponentProps,
   InputLabel,
   MenuItem,
   Select,
 } from '@mui/material'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
 import CkAdd from '../assets/icons/CkAdd.svg?react'
 import { forwardRef, useState } from 'react'
@@ -91,14 +92,17 @@ const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
 
 export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
   // Hooks do react-hook-form para gerenciar o formulário
-  const { register, handleSubmit, watch, setValue, reset } = useForm<Inputs>()
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>()
   const [entradaInput, setEntradaInput] = useState('')
   const [catracaInput, setCatracaInput] = useState('')
   const [entradas, setEntradas] = useState<Set<string>>(new Set())
   const [catracas, setCatracas] = useState<Set<string>>(new Set())
-
-  const selectedTipo = watch('novoTipo')
-  const selectedEstado = watch('novoEstado')
 
   // Função para adicionar um item (entrada ou catraca)
   const handleAddItem = (
@@ -191,14 +195,33 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <Typography color="primary">Informações básicas</Typography>
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-nome">
-                  <Typography color="primary">Nome do local*</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-nome"
-                  placeholder="Informe o nome do local"
-                  {...register('novoNome', { required: true })}
-                ></Input>
+                <Controller
+                  name="novoNome"
+                  defaultValue=""
+                  control={control}
+                  rules={{ required: 'Campo vazio' }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-nome">
+                        <Typography color="primary">Nome do local*</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-nome"
+                        placeholder="Informe o nome do local"
+                        error={!!errors.novoNome}
+                      />
+                      {errors.novoNome && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoNome.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-apelido">
@@ -211,49 +234,66 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 ></Input>
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-tipo">
-                  <Typography color="primary">Selecione um tipo*</Typography>
-                </InputLabel>
-                <Select
-                  input={<Input />}
-                  IconComponent={CkChevronDown}
-                  sx={{
-                    '& .MuiSelect-icon': { top: 'unset' },
-                  }}
-                  id="novo-tipo"
-                  placeholder="Selecione um tipo"
-                  renderValue={(value) =>
-                    value ? (
-                      value
-                    ) : (
-                      <Typography
-                        color={palette.greyBlue.main}
+                <Controller
+                  name="novoTipo"
+                  control={control}
+                  rules={{ required: 'Selecione um tipo' }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-tipo">
+                        <Typography color="primary">
+                          Selecione um tipo*
+                        </Typography>
+                      </InputLabel>
+                      <Select
+                        {...field}
+                        value={field.value || ''}
+                        input={<Input />}
+                        IconComponent={CkChevronDown}
                         sx={{
-                          fontWeight: 400,
+                          '& .MuiSelect-icon': { top: 'unset' },
                         }}
+                        id="novo-tipo"
+                        placeholder="Selecione um tipo"
+                        renderValue={(value) =>
+                          value ? (
+                            value
+                          ) : (
+                            <Typography
+                              color={palette.greyBlue.main}
+                              sx={{
+                                fontWeight: 400,
+                              }}
+                            >
+                              Selecione um tipo
+                            </Typography>
+                          )
+                        }
+                        error={!!errors.novoTipo}
+                        displayEmpty
                       >
-                        Selecione um tipo
-                      </Typography>
-                    )
-                  }
-                  value={selectedTipo || ''}
-                  {...register('novoTipo', {
-                    required: 'You must select an option',
-                    onChange: (e) => setValue('novoTipo', e.target.value),
-                  })}
-                  displayEmpty
-                >
-                  <MenuItem disabled value="">
-                    <em>Selecione um tipo</em>
-                  </MenuItem>
-                  <MenuItem value="Estádio">Estádio</MenuItem>
-                  <MenuItem value="Teatro">Teatro</MenuItem>
-                  <MenuItem value="Cinema">Cinema</MenuItem>
-                  <MenuItem value="Centro de Convenções">
-                    Centro de Convenções
-                  </MenuItem>
-                  <MenuItem value="Outro">Outro</MenuItem>
-                </Select>
+                        <MenuItem disabled value="">
+                          <em>Selecione um tipo</em>
+                        </MenuItem>
+                        <MenuItem value="Estádio">Estádio</MenuItem>
+                        <MenuItem value="Teatro">Teatro</MenuItem>
+                        <MenuItem value="Cinema">Cinema</MenuItem>
+                        <MenuItem value="Centro de Convenções">
+                          Centro de Convenções
+                        </MenuItem>
+                        <MenuItem value="Outro">Outro</MenuItem>
+                      </Select>
+                      {errors.novoTipo && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoTipo.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-cnpj">
@@ -274,79 +314,151 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <Typography color="primary">Localização</Typography>
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-cidade">
-                  <Typography color="primary">Cidade*</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-cidade"
-                  placeholder="Informe a Cidade"
-                  {...register('novoCidade', { required: true })}
-                ></Input>
+                <Controller
+                  name="novoCidade"
+                  defaultValue=""
+                  control={control}
+                  rules={{ required: 'Campo vazio' }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-cidade">
+                        <Typography color="primary">Cidade*</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-cidade"
+                        placeholder="Informe a Cidade"
+                        error={!!errors.novoCidade}
+                      />
+                      {errors.novoCidade && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoCidade.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-estado">
-                  <Typography color="primary">Estado*</Typography>
-                </InputLabel>
-                <Select
-                  input={<Input />}
-                  IconComponent={CkChevronDown}
-                  sx={{
-                    '& .MuiSelect-icon': { top: 'unset' },
-                  }}
-                  id="novo-estado"
-                  placeholder="Selecione um estado"
-                  renderValue={(value) =>
-                    value ? (
-                      value
-                    ) : (
-                      <Typography
-                        color={palette.greyBlue.main}
+                <Controller
+                  name="novoEstado"
+                  control={control}
+                  rules={{ required: 'Selecione um estado' }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-estado">
+                        <Typography color="primary">Estado*</Typography>
+                      </InputLabel>
+                      <Select
+                        {...field}
+                        value={field.value || ''}
+                        input={<Input />}
+                        IconComponent={CkChevronDown}
                         sx={{
-                          fontWeight: 400,
+                          '& .MuiSelect-icon': { top: 'unset' },
                         }}
+                        id="novo-estado"
+                        placeholder="Selecione um estado"
+                        renderValue={(value) =>
+                          value ? (
+                            value
+                          ) : (
+                            <Typography
+                              color={palette.greyBlue.main}
+                              sx={{
+                                fontWeight: 400,
+                              }}
+                            >
+                              Selecione um estado
+                            </Typography>
+                          )
+                        }
+                        error={!!errors.novoEstado}
+                        displayEmpty
                       >
-                        Selecione um estado
-                      </Typography>
-                    )
-                  }
-                  value={selectedEstado || ''}
-                  {...register('novoEstado', {
-                    required: 'You must select an option',
-                    onChange: (e) => setValue('novoEstado', e.target.value),
-                  })}
-                  displayEmpty
-                >
-                  <MenuItem disabled value="">
-                    <em>Selecione um estado</em>
-                  </MenuItem>
-                  {ESTADOS.map((estado) => (
-                    <MenuItem key={estado} value={estado}>
-                      {estado}
-                    </MenuItem>
-                  ))}
-                </Select>
+                        <MenuItem disabled value="">
+                          <em>Selecione um estado</em>
+                        </MenuItem>
+                        {ESTADOS.map((estado) => (
+                          <MenuItem key={estado} value={estado}>
+                            {estado}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.novoEstado && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoEstado.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-cep">
-                  <Typography color="primary">CEP*</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-cep"
-                  placeholder="Informe o CEP"
-                  inputComponent={MaskedInput}
-                  inputProps={{ mask: '00000-000' }}
-                  {...register('novoCep', { required: true })}
-                ></Input>
+                <Controller
+                  name="novoCep"
+                  defaultValue=""
+                  control={control}
+                  rules={{ required: 'Campo vazio' }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-cep">
+                        <Typography color="primary">CEP*</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-cep"
+                        placeholder="Informe o CEP"
+                        inputComponent={MaskedInput}
+                        inputProps={{ mask: '00000-000' }}
+                        error={!!errors.novoCep}
+                      />
+                      {errors.novoCep && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoCep.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-endereco">
-                  <Typography color="primary">Endereço*</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-endereco"
-                  placeholder="Informe o Endereço"
-                  {...register('novoEndereco', { required: true })}
-                ></Input>
+                <Controller
+                  name="novoEndereco"
+                  defaultValue=""
+                  control={control}
+                  rules={{ required: 'Campo vazio' }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-endereco">
+                        <Typography color="primary">Endereço*</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-endereco"
+                        placeholder="Informe o Endereço"
+                        error={!!errors.novoEndereco}
+                      />
+                      {errors.novoEndereco && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoEndereco.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-complemento">
@@ -365,14 +477,40 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <Typography color="primary">Contato</Typography>
               </Grid>
               <Grid size={6}>
-                <InputLabel htmlFor="novo-email">
-                  <Typography color="primary">E-mail*</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-email"
-                  placeholder="Informe um e-mail"
-                  {...register('novoEndereco', { required: true })}
-                ></Input>
+                <Controller
+                  name="novoEmail"
+                  defaultValue=""
+                  control={control}
+                  rules={{
+                    required: 'Campo vazio',
+                    pattern: {
+                      value:
+                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                      message: 'E-mail inválido',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-email">
+                        <Typography color="primary">E-mail*</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-email"
+                        placeholder="Informe um email"
+                        error={!!errors.novoEmail}
+                      />
+                      {errors.novoEmail && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoEmail.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={6}>
                 <InputLabel htmlFor="novo-telefone">

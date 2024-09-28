@@ -32,7 +32,7 @@ const theme = createTheme({
     surface2: { main: '#191E28' },
     success: { main: '#99C766' },
     warning: { main: '#F79E1B' },
-    error: { main: '#CD2C19' },
+    error: { main: '#F6285F' },
     successSuport: { main: '#2F3B28' },
     warningSuport: { main: '#61461F' },
     errorSuport: { main: '#461527' },
@@ -47,6 +47,10 @@ const theme = createTheme({
           backgroundColor: '#333B49',
           padding: '0.2rem 0.5rem',
           borderRadius: '4px',
+          '&.Mui-error': {
+            border: '1px solid #F6285F',
+            '&:before': { borderBottom: 'unset' },
+          },
         },
         input: {
           '::placeholder': { color: '#808FA9', opacity: 1 },
