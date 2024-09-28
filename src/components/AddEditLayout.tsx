@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import useTheme from '@mui/material/styles/useTheme'
 import {
+  Alert,
   Button,
   Divider,
   FormHelperText,
@@ -13,6 +14,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
+  SnackbarCloseReason,
 } from '@mui/material'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
@@ -103,6 +106,8 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
   const [catracaInput, setCatracaInput] = useState('')
   const [entradas, setEntradas] = useState<Set<string>>(new Set())
   const [catracas, setCatracas] = useState<Set<string>>(new Set())
+  const [openSuccess, setOpenSuccess] = useState(false)
+  const [openError, setOpenError] = useState(false)
 
   // Função para adicionar um item (entrada ou catraca)
   const handleAddItem = (
@@ -154,6 +159,29 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
     reset()
     setEntradas(new Set())
     setCatracas(new Set())
+    handleOpenAlert('success')
+  }
+  // Função para caso algum erro ocorra devido a validação
+  const onError = () => {
+    handleOpenAlert('error')
+  }
+
+  // Funções para abrir e fechar o alerta de sucesso ou erro
+  const handleOpenAlert = (type: 'success' | 'error') => {
+    if (type === 'success') {
+      setOpenSuccess(true)
+    } else setOpenError(true)
+  }
+
+  const handleCloseAlert = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ) => {
+    if (reason === 'clickaway') {
+      return
+    }
+    setOpenSuccess(false)
+    setOpenError(false)
   }
 
   const palette = useTheme().palette
@@ -622,7 +650,7 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                     <Typography color="primary">Cancelar</Typography>
                   </Button>
                   <Button
-                    onClick={handleSubmit(onSubmit)}
+                    onClick={handleSubmit(onSubmit, onError)}
                     variant="contained"
                     sx={{ textTransform: 'none', radius: '6px', px: 4 }}
                   >
@@ -632,6 +660,34 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   </Button>
                 </Box>
               </Grid>
+              <Snackbar
+                open={openSuccess}
+                autoHideDuration={6000}
+                onClose={handleCloseAlert}
+              >
+                <Alert
+                  onClose={handleCloseAlert}
+                  severity="success"
+                  variant="filled"
+                  sx={{ width: '100%' }}
+                >
+                  Uma nova edição foi salva
+                </Alert>
+              </Snackbar>
+              <Snackbar
+                open={openError}
+                autoHideDuration={6000}
+                onClose={handleCloseAlert}
+              >
+                <Alert
+                  onClose={handleCloseAlert}
+                  severity="error"
+                  variant="filled"
+                  sx={{ width: '100%' }}
+                >
+                  Não foi possível salvar a edição
+                </Alert>
+              </Snackbar>
             </Grid>
           </Container>
         </Grid>
