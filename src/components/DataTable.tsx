@@ -16,25 +16,8 @@ import {
   Typography,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-
-interface BaseRow {
-  id: number
-  nome: string
-  endereco: string
-  portoes: string
-}
-
-interface LocalRow extends BaseRow {
-  cidade_uf: string
-  atualizacao: string
-}
-
-interface EventoRow extends BaseRow {
-  tipo: string
-  local: string
-  data: string
-}
-
+import { useRouteLoaderData } from 'react-router-dom'
+import { Local, Evento } from '../utils/getPlaceholder'
 type TableMode = 'local' | 'evento'
 
 interface Column {
@@ -67,114 +50,6 @@ const columns: Record<TableMode, Column[]> = {
     { field: 'data', headerName: 'Data' },
   ],
 }
-
-const localRows: LocalRow[] = [
-  {
-    id: 1,
-    nome: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 2,
-    nome: 'Alianz Parque',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 3,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 4,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 5,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 6,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-]
-
-const eventoRows: EventoRow[] = [
-  {
-    id: 1,
-    nome: 'Final Copa América',
-    tipo: 'Futebol',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 2,
-    nome: 'Semi Final Copa América',
-    tipo: 'Futebol',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 3,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 4,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 5,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 6,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-]
 
 const getTipoCellStyle = (tipo: string, palette: any) => {
   const baseStyle = {
@@ -281,7 +156,7 @@ const BotoesPaginacao: React.FC<{
  * @returns JSX.Element - O conteúdo da tabela renderizado.
  */
 const TableContent: React.FC<{
-  rows: (LocalRow | EventoRow)[]
+  rows: (Local | Evento)[]
   columns: Column[]
   tableMode: TableMode
   simple?: boolean
@@ -370,8 +245,13 @@ const DataTable: React.FC<DataTableProps> = ({
   simple = false,
   searchQuery,
 }) => {
+  const data = useRouteLoaderData('root') as {
+    locais: Local[]
+    eventos: Evento[]
+  }
+  const { locais, eventos } = data
   const [paginaAtual, setPaginaAtual] = useState(1)
-  const rows = tableMode === 'local' ? localRows : eventoRows
+  const rows = tableMode === 'local' ? locais : eventos
   const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)
   /* Pesquisa por nome */
   const regex = searchQuery ? new RegExp(searchQuery, 'i') : null

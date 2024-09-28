@@ -13,6 +13,12 @@ import Eventos from './routes/Eventos.tsx'
 import Locais from './routes/Locais.tsx'
 import AddEditLayout from './components/AddEditLayout.tsx'
 import { SnackbarProvider } from './contexts/SnackbarContext.tsx'
+import { getPlaceholder } from './utils/getPlaceholder.ts'
+
+async function placeholderLoader() {
+  const { locais, eventos } = getPlaceholder()
+  return { locais, eventos }
+}
 
 const theme = createTheme({
   palette: {
@@ -77,6 +83,8 @@ const router = createBrowserRouter([
         </SnackbarProvider>
       </ThemeProvider>
     ),
+    id: 'root',
+    loader: placeholderLoader,
     children: [
       {
         path: '/',
