@@ -107,7 +107,11 @@ const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, id }) => {
         {['Edit', 'Apagar'].map((action) => (
           <MenuItem
             component={RouterLink}
-            to={`/${itemTipo}/${action.toLowerCase()}/${id}`}
+            to={
+              itemTipo === 'local'
+                ? `/locais/edit/${id}`
+                : `/eventos/edit/${id}`
+            }
             key={action}
             onClick={handleClose}
             sx={{
