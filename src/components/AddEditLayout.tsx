@@ -8,6 +8,7 @@ import {
   Button,
   Divider,
   Input,
+  InputBaseComponentProps,
   InputLabel,
   MenuItem,
   Select,
@@ -15,10 +16,17 @@ import {
 import { useForm, SubmitHandler } from 'react-hook-form'
 import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
 import CkAdd from '../assets/icons/CkAdd.svg?react'
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
+import { IMaskInput } from 'react-imask'
 
 interface AddEditLayoutProps {
   itemTipo: 'locais' | 'eventos'
+}
+
+interface MaskedInputProps extends InputBaseComponentProps {
+  mask: string
+  name: string
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 type Inputs = {
@@ -64,6 +72,22 @@ const ESTADOS = [
   'SE',
   'TO',
 ]
+
+const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
+  function MaskedInput(props, ref) {
+    const { mask, ...other } = props
+    return (
+      <IMaskInput
+        {...other}
+        mask={mask}
+        inputRef={ref}
+        onAccept={(value: any) =>
+          props.onChange({ target: { name: props.name, value } })
+        }
+      />
+    )
+  }
+)
 
 export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
   // Hooks do react-hook-form para gerenciar o formulário
@@ -238,8 +262,10 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <Input
                   id="novo-cnpj"
                   placeholder="Informe o CNPJ (caso conheça)"
+                  inputComponent={MaskedInput}
+                  inputProps={{ mask: '00.000.000/0000-00' }}
                   {...register('novoCnpj')}
-                ></Input>
+                />
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
@@ -307,6 +333,8 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <Input
                   id="novo-cep"
                   placeholder="Informe o CEP"
+                  inputComponent={MaskedInput}
+                  inputProps={{ mask: '00000-000' }}
                   {...register('novoCep', { required: true })}
                 ></Input>
               </Grid>
@@ -353,6 +381,8 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                 <Input
                   id="novo-telefone"
                   placeholder="Informe um telefone"
+                  inputComponent={MaskedInput}
+                  inputProps={{ mask: '(00) 00000-0000' }}
                   {...register('novoTelefone')}
                 ></Input>
               </Grid>
