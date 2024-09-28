@@ -15,12 +15,18 @@ import {
   Select,
 } from '@mui/material'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import { forwardRef, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { IMaskInput } from 'react-imask'
 import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
 import CkAdd from '../assets/icons/CkAdd.svg?react'
 import { useSnackbar } from '../contexts/SnackbarContext'
-import { useNavigate, Link as RouterLink } from 'react-router-dom'
+import {
+  useNavigate,
+  Link as RouterLink,
+  useParams,
+  useLoaderData,
+} from 'react-router-dom'
+import { Evento, Local } from '../utils/getPlaceholder'
 
 interface AddEditLayoutProps {
   itemTipo: 'locais' | 'eventos'
@@ -96,12 +102,16 @@ const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
 )
 
 export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
+  const { id } = useParams()
+  const isEditMode = !!id
+  const loaderData = useLoaderData() as Local | Evento | null
   // Hooks do react-hook-form para gerenciar o formulário
   const {
     control,
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>()
   const [entradaInput, setEntradaInput] = useState('')
@@ -109,6 +119,31 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
   const [entradas, setEntradas] = useState<Set<string>>(new Set())
   const [catracas, setCatracas] = useState<Set<string>>(new Set())
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isEditMode && loaderData) {
+      setValue('novoNome', loaderData.nome)
+      setValue('novoTipo', loaderData.tipo)
+      setValue('novoEndereco', loaderData.endereco)
+      setValue('novoEmail', loaderData.email)
+      setValue('novoTelefone', loaderData.telefone)
+      setEntradas(new Set(loaderData.entradas))
+
+      if (itemTipo === 'locais' && 'apelido' in loaderData) {
+        setValue('novoApelido', loaderData.apelido)
+        setValue('novoCnpj', loaderData.cnpj)
+        setValue('novoCidade', loaderData.cidade)
+        setValue('novoEstado', loaderData.uf)
+        setValue('novoCep', loaderData.cep)
+        setValue('novoComplemento', loaderData.complemento)
+        setCatracas(new Set(loaderData.catracas))
+      } else if (itemTipo === 'eventos' && 'local' in loaderData) {
+        setValue('novoLocalAssoc', loaderData.local)
+        setValue('novoData', loaderData.data)
+        setValue('novoHorario', loaderData.horario)
+      }
+    }
+  }, [isEditMode, loaderData, setValue, itemTipo])
 
   // Função para adicionar um item (entrada ou catraca)
   const handleAddItem = (
@@ -151,30 +186,73 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
 
   // Função para lidar com o envio do formulário
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const fullData = {
-      ...data,
-      ...(itemTipo === 'locais' && {
-        novoEntradas: Array.from(entradas),
-        novoCatracas: Array.from(catracas),
-      }),
+    let fullData: Partial<Local | Evento> = {
+      nome: data.novoNome,
+      tipo: data.novoTipo,
+      endereco: data.novoEndereco,
+      email: data.novoEmail,
+      telefone: data.novoTelefone,
+      entradas: Array.from(entradas),
     }
+
+    if (itemTipo === 'locais') {
+      fullData = {
+        ...fullData,
+        apelido: data.novoApelido,
+        cnpj: data.novoCnpj,
+        complemento: data.novoComplemento,
+        cidade: data.novoCidade,
+        uf: data.novoEstado,
+        cep: data.novoCep,
+        catracas: Array.from(catracas),
+        atualizacao: new Date().toISOString(),
+      } as Local
+    } else {
+      fullData = {
+        ...fullData,
+        local: data.novoLocalAssoc,
+        data: data.novoData,
+        horario: data.novoHorario,
+      } as Evento
+    }
+
     console.log(fullData)
     reset()
     if (itemTipo === 'locais') {
       setEntradas(new Set())
       setCatracas(new Set())
-      showSnackbar('Sucesso', 'um novo local foi adicionado', 'success')
+      showSnackbar(
+        'Sucesso',
+        isEditMode ? 'Local atualizado' : 'Novo local adicionado',
+        'success'
+      )
     } else {
-      showSnackbar('Sucesso', 'um novo evento foi adicionado', 'success')
+      showSnackbar(
+        'Sucesso',
+        isEditMode ? 'Evento atualizado' : 'Novo evento adicionado',
+        'success'
+      )
     }
     navigate(`/${itemTipo}`)
   }
   // Função para caso algum erro ocorra devido a validação
   const onError = () => {
     if (itemTipo === 'locais') {
-      showSnackbar('Erro', 'não foi possível adicionar um novo local', 'error')
+      showSnackbar(
+        'Erro',
+        isEditMode
+          ? 'não foi possível atualizar o local'
+          : 'não foi possível adicionar um novo local',
+        'error'
+      )
     } else {
-      showSnackbar('Erro', 'não foi possível adicionar um novo evento', 'error')
+      showSnackbar(
+        'Erro',
+        isEditMode
+          ? 'não foi possível atualizar o evento'
+          : 'não foi possível adicionar um novo evento',
+        'error'
+      )
     }
   }
 

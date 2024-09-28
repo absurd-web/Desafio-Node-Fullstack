@@ -14,27 +14,11 @@ import {
   MenuItem,
   lighten,
   Typography,
+  Modal,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-
-interface BaseRow {
-  id: number
-  nome: string
-  endereco: string
-  portoes: string
-}
-
-interface LocalRow extends BaseRow {
-  cidade_uf: string
-  atualizacao: string
-}
-
-interface EventoRow extends BaseRow {
-  tipo: string
-  local: string
-  data: string
-}
-
+import { useRouteLoaderData, Link as RouterLink } from 'react-router-dom'
+import { Local, Evento } from '../utils/getPlaceholder'
 type TableMode = 'local' | 'evento'
 
 interface Column {
@@ -55,7 +39,7 @@ const columns: Record<TableMode, Column[]> = {
     { field: 'nome', headerName: 'Nome do Local' },
     { field: 'endereco', headerName: 'Endereço' },
     { field: 'cidade_uf', headerName: 'Cidade e Estado' },
-    { field: 'portoes', headerName: 'Portões cadastrados' },
+    { field: 'entradas', headerName: 'Portões cadastrados' },
     { field: 'atualizacao', headerName: 'Atualização' },
   ],
   evento: [
@@ -63,118 +47,10 @@ const columns: Record<TableMode, Column[]> = {
     { field: 'tipo', headerName: 'Tipo' },
     { field: 'local', headerName: 'Local associado' },
     { field: 'endereco', headerName: 'Endereço' },
-    { field: 'portoes', headerName: 'Portões cadastrados' },
+    { field: 'entradas', headerName: 'Portões cadastrados' },
     { field: 'data', headerName: 'Data' },
   ],
 }
-
-const localRows: LocalRow[] = [
-  {
-    id: 1,
-    nome: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 2,
-    nome: 'Alianz Parque',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 3,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 4,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 5,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-  {
-    id: 6,
-    nome: 'Neo Química Arena',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    cidade_uf: 'São Paulo; SP',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    atualizacao: '05/10/23',
-  },
-]
-
-const eventoRows: EventoRow[] = [
-  {
-    id: 1,
-    nome: 'Final Copa América',
-    tipo: 'Futebol',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 2,
-    nome: 'Semi Final Copa América',
-    tipo: 'Futebol',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 3,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 4,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 5,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-  {
-    id: 6,
-    nome: 'Love on tour - Harry Styles',
-    tipo: 'Show',
-    local: 'Morumbis',
-    endereco: 'Avenida Francisco Matarazzo, 1705 – Água Branca',
-    portoes: `A,B,C,D,E,F,G,H,I,J,K,`,
-    data: '05/10/23',
-  },
-]
 
 const getTipoCellStyle = (tipo: string, palette: any) => {
   const baseStyle = {
@@ -198,8 +74,14 @@ const getTipoCellStyle = (tipo: string, palette: any) => {
       }
 }
 
-const RowMenu: React.FC = () => {
+interface RowMenuProps {
+  itemTipo: TableMode
+  rowData: { id: string; nome: string }
+}
+
+const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [openModal, setOpenModal] = useState(false)
   const { palette } = useTheme()
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -208,6 +90,14 @@ const RowMenu: React.FC = () => {
 
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const handleOpenModal = () => {
+    setOpenModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setOpenModal(false)
   }
 
   return (
@@ -224,20 +114,95 @@ const RowMenu: React.FC = () => {
           '& .MuiList-root': { p: 0 },
         }}
       >
-        {['Edit', 'Apagar'].map((action) => (
-          <MenuItem
-            key={action}
-            onClick={handleClose}
+        <MenuItem
+          component={RouterLink}
+          to={
+            itemTipo === 'local'
+              ? `/locais/edit/${rowData.id}`
+              : `/eventos/edit/${rowData.id}`
+          }
+          onClick={handleClose}
+          sx={{
+            '&:hover': {
+              backgroundColor: lighten(palette.surface2.main, 0.05),
+            },
+            color: 'primary.main',
+          }}
+        >
+          Editar
+        </MenuItem>
+        <MenuItem
+          onClick={handleOpenModal}
+          sx={{
+            '&:hover': {
+              backgroundColor: lighten(palette.surface2.main, 0.05),
+            },
+            color: 'primary.main',
+          }}
+        >
+          Apagar
+        </MenuItem>
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box
             sx={{
-              '&:hover': {
-                backgroundColor: lighten(palette.surface2.main, 0.05),
-              },
+              position: 'absolute' as 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
               color: 'primary.main',
+              bgcolor: 'background.default',
+              borderRadius: '6px',
+              boxShadow: 24,
+              py: 2,
+              px: 2,
             }}
           >
-            {action}
-          </MenuItem>
-        ))}
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '20px',
+              }}
+            >
+              Apagar evento
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              Você tem certeza que deseja apagar o evento{' '}
+              <em>"{rowData.nome}"</em>?
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                mt: 2,
+                gap: 1,
+              }}
+            >
+              <Button
+                variant="outlined"
+                onClick={handleCloseModal}
+                sx={{ textTransform: 'none', color: 'primary.main' }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                disableElevation
+                variant="contained"
+                onClick={handleCloseModal}
+                sx={{
+                  textTransform: 'none',
+                  color: palette.onPrimary.main,
+                  bgcolor: palette.supportBlue.main,
+                }}
+              >
+                Apagar
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </Menu>
     </>
   )
@@ -281,7 +246,7 @@ const BotoesPaginacao: React.FC<{
  * @returns JSX.Element - O conteúdo da tabela renderizado.
  */
 const TableContent: React.FC<{
-  rows: (LocalRow | EventoRow)[]
+  rows: (Local | Evento)[]
   columns: Column[]
   tableMode: TableMode
   simple?: boolean
@@ -336,12 +301,23 @@ const TableContent: React.FC<{
                         : {}
                     }
                   >
-                    {row[column.field as keyof typeof row]}
+                    {/* combina cidade e uf para display */}
+                    {column.field === 'cidade_uf'
+                      ? 'cidade' in row
+                        ? `${row.cidade}; ${row.uf}`
+                        : ''
+                      : /* entradas é um array, virgulas para display */
+                        column.field === 'entradas'
+                        ? (row[column.field] as string[]).join(',')
+                        : row[column.field as keyof typeof row]}
                   </Typography>
                 </TableCell>
               ))}
               <TableCell align="right">
-                <RowMenu />
+                <RowMenu
+                  itemTipo={tableMode}
+                  rowData={{ id: row.id, nome: row.nome }}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -370,8 +346,13 @@ const DataTable: React.FC<DataTableProps> = ({
   simple = false,
   searchQuery,
 }) => {
+  const data = useRouteLoaderData('root') as {
+    locais: Local[]
+    eventos: Evento[]
+  }
+  const { locais, eventos } = data
   const [paginaAtual, setPaginaAtual] = useState(1)
-  const rows = tableMode === 'local' ? localRows : eventoRows
+  const rows = tableMode === 'local' ? locais : eventos
   const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)
   /* Pesquisa por nome */
   const regex = searchQuery ? new RegExp(searchQuery, 'i') : null
