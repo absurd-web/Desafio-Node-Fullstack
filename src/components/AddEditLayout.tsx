@@ -20,7 +20,7 @@ import { IMaskInput } from 'react-imask'
 import CkChevronDown from '../assets/icons/CkChevronDown.svg?react'
 import CkAdd from '../assets/icons/CkAdd.svg?react'
 import { useSnackbar } from '../contexts/SnackbarContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link as RouterLink } from 'react-router-dom'
 
 interface AddEditLayoutProps {
   itemTipo: 'locais' | 'eventos'
@@ -34,16 +34,19 @@ interface MaskedInputProps extends InputBaseComponentProps {
 
 type Inputs = {
   novoNome: string
-  novoApelido: string
+  novoApelido?: string
   novoTipo: string
-  novoCnpj: string
-  novoCidade: string
-  novoEstado: string
-  novoCep: string
-  novoEndereco: string
-  novoComplemento: string
+  novoCnpj?: string
+  novoCidade?: string
+  novoEstado?: string
+  novoCep?: string
+  novoEndereco?: string
+  novoComplemento?: string
   novoEmail: string
-  novoTelefone: string
+  novoTelefone?: string
+  novoData?: string
+  novoHorario?: string
+  novoLocalAssoc?: string
 }
 
 const ESTADOS = [
@@ -150,19 +153,29 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const fullData = {
       ...data,
-      novoEntradas: Array.from(entradas),
-      novoCatracas: Array.from(catracas),
+      ...(itemTipo === 'locais' && {
+        novoEntradas: Array.from(entradas),
+        novoCatracas: Array.from(catracas),
+      }),
     }
     console.log(fullData)
     reset()
-    setEntradas(new Set())
-    setCatracas(new Set())
-    showSnackbar('Sucesso', 'um novo local foi adicionado', 'success')
+    if (itemTipo === 'locais') {
+      setEntradas(new Set())
+      setCatracas(new Set())
+      showSnackbar('Sucesso', 'um novo local foi adicionado', 'success')
+    } else {
+      showSnackbar('Sucesso', 'um novo evento foi adicionado', 'success')
+    }
     navigate(`/${itemTipo}`)
   }
   // Função para caso algum erro ocorra devido a validação
   const onError = () => {
-    showSnackbar('Erro', 'não foi possível adicionar um novo local', 'error')
+    if (itemTipo === 'locais') {
+      showSnackbar('Erro', 'não foi possível adicionar um novo local', 'error')
+    } else {
+      showSnackbar('Erro', 'não foi possível adicionar um novo evento', 'error')
+    }
   }
 
   const palette = useTheme().palette
@@ -213,12 +226,20 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   render={({ field }) => (
                     <>
                       <InputLabel htmlFor="novo-nome">
-                        <Typography color="primary">Nome do local*</Typography>
+                        <Typography color="primary">
+                          {itemTipo === 'locais'
+                            ? 'Nome do local*'
+                            : 'Nome do evento*'}
+                        </Typography>
                       </InputLabel>
                       <Input
                         {...field}
                         id="novo-nome"
-                        placeholder="Informe o nome do local"
+                        placeholder={
+                          itemTipo === 'locais'
+                            ? 'Informe o nome do local'
+                            : 'Informe o nome do evento'
+                        }
                         error={!!errors.novoNome}
                       />
                       {errors.novoNome && (
@@ -233,16 +254,18 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-apelido">
-                  <Typography color="primary">Apelido</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-apelido"
-                  placeholder="Informe um apelido (caso exista)"
-                  {...register('novoApelido')}
-                ></Input>
-              </Grid>
+              {itemTipo === 'locais' && (
+                <Grid size={6}>
+                  <InputLabel htmlFor="novo-apelido">
+                    <Typography color="primary">Apelido</Typography>
+                  </InputLabel>
+                  <Input
+                    id="novo-apelido"
+                    placeholder="Informe um apelido (caso exista)"
+                    {...register('novoApelido')}
+                  ></Input>
+                </Grid>
+              )}
               <Grid size={6}>
                 <Controller
                   name="novoTipo"
@@ -285,13 +308,23 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                         <MenuItem disabled value="">
                           <em>Selecione um tipo</em>
                         </MenuItem>
-                        <MenuItem value="Estádio">Estádio</MenuItem>
-                        <MenuItem value="Teatro">Teatro</MenuItem>
-                        <MenuItem value="Cinema">Cinema</MenuItem>
-                        <MenuItem value="Centro de Convenções">
-                          Centro de Convenções
-                        </MenuItem>
-                        <MenuItem value="Outro">Outro</MenuItem>
+                        {itemTipo === 'locais'
+                          ? [
+                              'Estádio',
+                              'Teatro',
+                              'Cinema',
+                              'Centro de Convenções',
+                              'Outro',
+                            ].map((tipo) => (
+                              <MenuItem key={tipo} value={tipo}>
+                                {tipo}
+                              </MenuItem>
+                            ))
+                          : ['Futebol', 'Show'].map((tipo) => (
+                              <MenuItem key={tipo} value={tipo}>
+                                {tipo}
+                              </MenuItem>
+                            ))}
                       </Select>
                       {errors.novoTipo && (
                         <FormHelperText
@@ -305,184 +338,318 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-cnpj">
-                  <Typography color="primary">CNPJ</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-cnpj"
-                  placeholder="Informe o CNPJ (caso conheça)"
-                  inputComponent={MaskedInput}
-                  inputProps={{ mask: '00.000.000/0000-00' }}
-                  {...register('novoCnpj')}
-                />
-              </Grid>
-              <Grid size={12}>
-                <Divider variant="middle" color={palette.onPrimary.main} />
-              </Grid>
-              <Grid size={12}>
-                <Typography color="primary">Localização</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Controller
-                  name="novoCidade"
-                  defaultValue=""
-                  control={control}
-                  rules={{ required: 'Campo vazio' }}
-                  render={({ field }) => (
-                    <>
-                      <InputLabel htmlFor="novo-cidade">
-                        <Typography color="primary">Cidade*</Typography>
-                      </InputLabel>
-                      <Input
-                        {...field}
-                        id="novo-cidade"
-                        placeholder="Informe a Cidade"
-                        error={!!errors.novoCidade}
-                      />
-                      {errors.novoCidade && (
-                        <FormHelperText
-                          sx={{ display: 'flex', justifyContent: 'end' }}
-                          error
-                        >
-                          {errors.novoCidade.message}
-                        </FormHelperText>
-                      )}
-                    </>
-                  )}
-                />
-              </Grid>
-              <Grid size={6}>
-                <Controller
-                  name="novoEstado"
-                  control={control}
-                  rules={{ required: 'Selecione um estado' }}
-                  render={({ field }) => (
-                    <>
-                      <InputLabel htmlFor="novo-estado">
-                        <Typography color="primary">Estado*</Typography>
-                      </InputLabel>
-                      <Select
-                        {...field}
-                        value={field.value || ''}
-                        input={<Input />}
-                        IconComponent={CkChevronDown}
-                        sx={{
-                          '& .MuiSelect-icon': { top: 'unset' },
-                        }}
-                        id="novo-estado"
-                        placeholder="Selecione um estado"
-                        renderValue={(value) =>
-                          value ? (
-                            value
-                          ) : (
-                            <Typography
-                              color={palette.greyBlue.main}
-                              sx={{
-                                fontWeight: 400,
-                              }}
-                            >
-                              Selecione um estado
+              {itemTipo === 'locais' && (
+                <Grid size={6}>
+                  <InputLabel htmlFor="novo-cnpj">
+                    <Typography color="primary">CNPJ</Typography>
+                  </InputLabel>
+                  <Input
+                    id="novo-cnpj"
+                    placeholder="Informe o CNPJ (caso conheça)"
+                    inputComponent={MaskedInput}
+                    inputProps={{ mask: '00.000.000/0000-00' }}
+                    {...register('novoCnpj')}
+                  />
+                </Grid>
+              )}
+              {itemTipo === 'eventos' && (
+                <>
+                  <Grid size={6}>
+                    <Controller
+                      name="novoData"
+                      defaultValue=""
+                      control={control}
+                      rules={{ required: 'Campo vazio' }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel htmlFor="novo-data">
+                            <Typography color="primary">
+                              Data do evento*
                             </Typography>
-                          )
-                        }
-                        error={!!errors.novoEstado}
-                        displayEmpty
-                      >
-                        <MenuItem disabled value="">
-                          <em>Selecione um estado</em>
-                        </MenuItem>
-                        {ESTADOS.map((estado) => (
-                          <MenuItem key={estado} value={estado}>
-                            {estado}
+                          </InputLabel>
+                          <Input
+                            {...field}
+                            id="novo-data"
+                            placeholder="00/00/0000"
+                            inputComponent={MaskedInput}
+                            inputProps={{ mask: '00/00/0000' }}
+                            error={!!errors.novoData}
+                          />
+                          {errors.novoData && (
+                            <FormHelperText
+                              sx={{ display: 'flex', justifyContent: 'end' }}
+                              error
+                            >
+                              {errors.novoData.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Grid>
+                  <Grid size={6}>
+                    <Controller
+                      name="novoHorario"
+                      defaultValue=""
+                      control={control}
+                      rules={{ required: 'Campo vazio' }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel htmlFor="novo-horario">
+                            <Typography color="primary">
+                              Horario do evento*
+                            </Typography>
+                          </InputLabel>
+                          <Input
+                            {...field}
+                            id="novo-horario"
+                            placeholder="Adicione o horário do evento"
+                            inputComponent={MaskedInput}
+                            inputProps={{ mask: '00:00h' }}
+                            error={!!errors.novoHorario}
+                          />
+                          {errors.novoHorario && (
+                            <FormHelperText
+                              sx={{ display: 'flex', justifyContent: 'end' }}
+                              error
+                            >
+                              {errors.novoHorario.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Grid>
+                </>
+              )}
+              {itemTipo === 'eventos' && (
+                <Grid size={6}>
+                  <Controller
+                    name="novoLocalAssoc"
+                    control={control}
+                    rules={{ required: 'Selecione um local' }}
+                    render={({ field }) => (
+                      <>
+                        <InputLabel htmlFor="novo-localassoc">
+                          <Typography color="primary">
+                            Selecione um Local*
+                          </Typography>
+                        </InputLabel>
+                        <Select
+                          {...field}
+                          value={field.value || ''}
+                          input={<Input />}
+                          IconComponent={CkChevronDown}
+                          sx={{
+                            '& .MuiSelect-icon': { top: 'unset' },
+                          }}
+                          id="novo-localassoc"
+                          placeholder="Selecione um local"
+                          renderValue={(value) =>
+                            value ? (
+                              value
+                            ) : (
+                              <Typography
+                                color={palette.greyBlue.main}
+                                sx={{
+                                  fontWeight: 400,
+                                }}
+                              >
+                                Selecione um local
+                              </Typography>
+                            )
+                          }
+                          error={!!errors.novoLocalAssoc}
+                          displayEmpty
+                        >
+                          <MenuItem disabled value="">
+                            <em>Selecione um local</em>
                           </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.novoEstado && (
-                        <FormHelperText
-                          sx={{ display: 'flex', justifyContent: 'end' }}
-                          error
-                        >
-                          {errors.novoEstado.message}
-                        </FormHelperText>
-                      )}
-                    </>
-                  )}
-                />
-              </Grid>
-              <Grid size={6}>
-                <Controller
-                  name="novoCep"
-                  defaultValue=""
-                  control={control}
-                  rules={{ required: 'Campo vazio' }}
-                  render={({ field }) => (
-                    <>
-                      <InputLabel htmlFor="novo-cep">
-                        <Typography color="primary">CEP*</Typography>
-                      </InputLabel>
-                      <Input
-                        {...field}
-                        id="novo-cep"
-                        placeholder="Informe o CEP"
-                        inputComponent={MaskedInput}
-                        inputProps={{ mask: '00000-000' }}
-                        error={!!errors.novoCep}
-                      />
-                      {errors.novoCep && (
-                        <FormHelperText
-                          sx={{ display: 'flex', justifyContent: 'end' }}
-                          error
-                        >
-                          {errors.novoCep.message}
-                        </FormHelperText>
-                      )}
-                    </>
-                  )}
-                />
-              </Grid>
-              <Grid size={6}>
-                <Controller
-                  name="novoEndereco"
-                  defaultValue=""
-                  control={control}
-                  rules={{ required: 'Campo vazio' }}
-                  render={({ field }) => (
-                    <>
-                      <InputLabel htmlFor="novo-endereco">
-                        <Typography color="primary">Endereço*</Typography>
-                      </InputLabel>
-                      <Input
-                        {...field}
-                        id="novo-endereco"
-                        placeholder="Informe o Endereço"
-                        error={!!errors.novoEndereco}
-                      />
-                      {errors.novoEndereco && (
-                        <FormHelperText
-                          sx={{ display: 'flex', justifyContent: 'end' }}
-                          error
-                        >
-                          {errors.novoEndereco.message}
-                        </FormHelperText>
-                      )}
-                    </>
-                  )}
-                />
-              </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-complemento">
-                  <Typography color="primary">Complemento</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-complemento"
-                  placeholder="Informe o complemento"
-                  {...register('novoComplemento')}
-                ></Input>
-              </Grid>
+                          <MenuItem value="local">Local</MenuItem>
+                        </Select>
+                        {errors.novoLocalAssoc && (
+                          <FormHelperText
+                            sx={{ display: 'flex', justifyContent: 'end' }}
+                            error
+                          >
+                            {errors.novoLocalAssoc.message}
+                          </FormHelperText>
+                        )}
+                      </>
+                    )}
+                  />
+                </Grid>
+              )}
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
               </Grid>
+              {itemTipo === 'locais' && (
+                <>
+                  <Grid size={12}>
+                    <Typography color="primary">Localização</Typography>
+                  </Grid>
+                  <Grid size={6}>
+                    <Controller
+                      name="novoCidade"
+                      defaultValue=""
+                      control={control}
+                      rules={{ required: 'Campo vazio' }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel htmlFor="novo-cidade">
+                            <Typography color="primary">Cidade*</Typography>
+                          </InputLabel>
+                          <Input
+                            {...field}
+                            id="novo-cidade"
+                            placeholder="Informe a Cidade"
+                            error={!!errors.novoCidade}
+                          />
+                          {errors.novoCidade && (
+                            <FormHelperText
+                              sx={{ display: 'flex', justifyContent: 'end' }}
+                              error
+                            >
+                              {errors.novoCidade.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Grid>
+                  <Grid size={6}>
+                    <Controller
+                      name="novoEstado"
+                      control={control}
+                      rules={{ required: 'Selecione um estado' }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel htmlFor="novo-estado">
+                            <Typography color="primary">Estado*</Typography>
+                          </InputLabel>
+                          <Select
+                            {...field}
+                            value={field.value || ''}
+                            input={<Input />}
+                            IconComponent={CkChevronDown}
+                            sx={{
+                              '& .MuiSelect-icon': { top: 'unset' },
+                            }}
+                            id="novo-estado"
+                            placeholder="Selecione um estado"
+                            renderValue={(value) =>
+                              value ? (
+                                value
+                              ) : (
+                                <Typography
+                                  color={palette.greyBlue.main}
+                                  sx={{
+                                    fontWeight: 400,
+                                  }}
+                                >
+                                  Selecione um estado
+                                </Typography>
+                              )
+                            }
+                            error={!!errors.novoEstado}
+                            displayEmpty
+                          >
+                            <MenuItem disabled value="">
+                              <em>Selecione um estado</em>
+                            </MenuItem>
+                            {ESTADOS.map((estado) => (
+                              <MenuItem key={estado} value={estado}>
+                                {estado}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          {errors.novoEstado && (
+                            <FormHelperText
+                              sx={{ display: 'flex', justifyContent: 'end' }}
+                              error
+                            >
+                              {errors.novoEstado.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Grid>
+                  <Grid size={6}>
+                    <Controller
+                      name="novoCep"
+                      defaultValue=""
+                      control={control}
+                      rules={{ required: 'Campo vazio' }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel htmlFor="novo-cep">
+                            <Typography color="primary">CEP*</Typography>
+                          </InputLabel>
+                          <Input
+                            {...field}
+                            id="novo-cep"
+                            placeholder="Informe o CEP"
+                            inputComponent={MaskedInput}
+                            inputProps={{ mask: '00000-000' }}
+                            error={!!errors.novoCep}
+                          />
+                          {errors.novoCep && (
+                            <FormHelperText
+                              sx={{ display: 'flex', justifyContent: 'end' }}
+                              error
+                            >
+                              {errors.novoCep.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Grid>
+                  <Grid size={6}>
+                    <Controller
+                      name="novoEndereco"
+                      defaultValue=""
+                      control={control}
+                      rules={{ required: 'Campo vazio' }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel htmlFor="novo-endereco">
+                            <Typography color="primary">Endereço*</Typography>
+                          </InputLabel>
+                          <Input
+                            {...field}
+                            id="novo-endereco"
+                            placeholder="Informe o Endereço"
+                            error={!!errors.novoEndereco}
+                          />
+                          {errors.novoEndereco && (
+                            <FormHelperText
+                              sx={{ display: 'flex', justifyContent: 'end' }}
+                              error
+                            >
+                              {errors.novoEndereco.message}
+                            </FormHelperText>
+                          )}
+                        </>
+                      )}
+                    />
+                  </Grid>
+                  <Grid size={6}>
+                    <InputLabel htmlFor="novo-complemento">
+                      <Typography color="primary">Complemento</Typography>
+                    </InputLabel>
+                    <Input
+                      id="novo-complemento"
+                      placeholder="Informe o complemento"
+                      {...register('novoComplemento')}
+                    ></Input>
+                  </Grid>
+                  <Grid size={12}>
+                    <Divider variant="middle" color={palette.onPrimary.main} />
+                  </Grid>
+                </>
+              )}
               <Grid size={12}>
                 <Typography color="primary">Contato</Typography>
               </Grid>
@@ -537,95 +704,103 @@ export default function AddEditLayout({ itemTipo }: AddEditLayoutProps) {
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
               </Grid>
-              <Grid size={12}>
-                <Typography color="primary">
-                  Cadastro de entradas e catracas
-                </Typography>
-              </Grid>
-              {['entrada', 'catraca'].map((itemType) => (
-                <Grid size={6} key={itemType}>
-                  <InputLabel htmlFor={`novo-${itemType}s`}>
-                    <Typography color="primary">{`Cadastre as ${itemType}s`}</Typography>
-                  </InputLabel>
-                  <Box sx={{ display: 'flex', alignItems: 'stretch' }}>
-                    <Input
-                      id={`novo-${itemType}s`}
-                      placeholder={`Insira as ${itemType}s`}
-                      value={
-                        itemType === 'entrada' ? entradaInput : catracaInput
-                      }
-                      onChange={(e) =>
-                        itemType === 'entrada'
-                          ? setEntradaInput(e.target.value)
-                          : setCatracaInput(e.target.value)
-                      }
-                      onKeyDown={(e) =>
-                        handleKeyDown(e, itemType as 'entrada' | 'catraca')
-                      }
-                    />
-                    <Button
-                      onClick={() =>
-                        handleAddItem(
-                          itemType as 'entrada' | 'catraca',
-                          itemType === 'entrada' ? entradaInput : catracaInput
-                        )
-                      }
-                      sx={{
-                        borderRadius: '4px',
-                        minHeight: 'unset',
-                        minWidth: 'unset',
-                        bgcolor: '#051D41',
-                      }}
-                    >
-                      <CkAdd className="icon-add" />
-                    </Button>
-                  </Box>
-                  <Box>
-                    {Array.from(
-                      itemType === 'entrada' ? entradas : catracas
-                    ).map((item) => (
-                      <Button
-                        key={item}
-                        onClick={() =>
-                          handleRemoveItem(
-                            itemType as 'entrada' | 'catraca',
-                            item
-                          )
-                        }
-                        disableRipple
-                        sx={{
-                          textTransform: 'none',
-                          minWidth: 'unset',
-                          py: 0.3,
-                          borderRadius: '6px',
-                          bgcolor: palette.skyBlue.main,
-                        }}
-                      >
-                        <Box
+              {itemTipo === 'locais' && (
+                <>
+                  <Grid size={12}>
+                    <Typography color="primary">
+                      Cadastro de entradas e catracas
+                    </Typography>
+                  </Grid>
+                  {['entrada', 'catraca'].map((itemType) => (
+                    <Grid size={6} key={itemType}>
+                      <InputLabel htmlFor={`novo-${itemType}s`}>
+                        <Typography color="primary">{`Cadastre as ${itemType}s`}</Typography>
+                      </InputLabel>
+                      <Box sx={{ display: 'flex', alignItems: 'stretch' }}>
+                        <Input
+                          id={`novo-${itemType}s`}
+                          placeholder={`Insira as ${itemType}s`}
+                          value={
+                            itemType === 'entrada' ? entradaInput : catracaInput
+                          }
+                          onChange={(e) =>
+                            itemType === 'entrada'
+                              ? setEntradaInput(e.target.value)
+                              : setCatracaInput(e.target.value)
+                          }
+                          onKeyDown={(e) =>
+                            handleKeyDown(e, itemType as 'entrada' | 'catraca')
+                          }
+                        />
+                        <Button
+                          onClick={() =>
+                            handleAddItem(
+                              itemType as 'entrada' | 'catraca',
+                              itemType === 'entrada'
+                                ? entradaInput
+                                : catracaInput
+                            )
+                          }
                           sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            gap: 1,
+                            borderRadius: '4px',
+                            minHeight: 'unset',
+                            minWidth: 'unset',
+                            bgcolor: '#051D41',
                           }}
                         >
-                          <Typography color={palette.onSecondary.main}>
-                            {item}
-                          </Typography>
-                          <Typography color={palette.greyBlue.main}>
-                            X
-                          </Typography>
-                        </Box>
-                      </Button>
-                    ))}
-                  </Box>
-                </Grid>
-              ))}
-              <Grid size={12}>
-                <Divider variant="middle" color={palette.onPrimary.main} />
-              </Grid>
+                          <CkAdd className="icon-add" />
+                        </Button>
+                      </Box>
+                      <Box>
+                        {Array.from(
+                          itemType === 'entrada' ? entradas : catracas
+                        ).map((item) => (
+                          <Button
+                            key={item}
+                            onClick={() =>
+                              handleRemoveItem(
+                                itemType as 'entrada' | 'catraca',
+                                item
+                              )
+                            }
+                            disableRipple
+                            sx={{
+                              textTransform: 'none',
+                              minWidth: 'unset',
+                              py: 0.3,
+                              borderRadius: '6px',
+                              bgcolor: palette.skyBlue.main,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                gap: 1,
+                              }}
+                            >
+                              <Typography color={palette.onSecondary.main}>
+                                {item}
+                              </Typography>
+                              <Typography color={palette.greyBlue.main}>
+                                X
+                              </Typography>
+                            </Box>
+                          </Button>
+                        ))}
+                      </Box>
+                    </Grid>
+                  ))}
+                  <Grid size={12}>
+                    <Divider variant="middle" color={palette.onPrimary.main} />
+                  </Grid>
+                </>
+              )}
               <Grid size={12}>
                 <Box sx={{ display: 'flex', gap: 3, justifyContent: 'end' }}>
                   <Button
+                    component={RouterLink}
+                    to={`/${itemTipo}`}
                     variant="outlined"
                     sx={{ textTransform: 'none', radius: '6px', px: 4 }}
                   >
