@@ -12,7 +12,8 @@ export default tseslint.config(
       'plugin:react/recommended',
       'plugin:react/jsx-runtime',
       'plugin:react-hooks/recommended',
-      js.configs.recommended, ...tseslint.configs.recommended,
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
       'eslint-config-prettier',
     ],
     files: ['**/*.{ts,tsx}'],
@@ -31,5 +32,5 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
     },
-  },
+  }
 )
