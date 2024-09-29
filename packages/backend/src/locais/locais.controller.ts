@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common'
 import { LocaisService } from './locais.service'
 import { CreateLocalDto } from './dto/create-local.dto'
@@ -32,19 +33,22 @@ export class LocaisController {
 
   @Get(':id')
   @ApiOkResponse({ type: LocalEntity })
-  findOne(@Param('id') id: string) {
-    return this.locaisService.findOne(+id)
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.locaisService.findOne(id)
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: LocalEntity })
-  update(@Param('id') id: string, @Body() updateLocalDto: UpdateLocalDto) {
-    return this.locaisService.update(+id, updateLocalDto)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateLocalDto: UpdateLocalDto
+  ) {
+    return this.locaisService.update(id, updateLocalDto)
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: LocalEntity })
-  remove(@Param('id') id: string) {
-    return this.locaisService.remove(+id)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.locaisService.remove(id)
   }
 }

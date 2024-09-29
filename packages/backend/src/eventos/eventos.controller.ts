@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common'
 import { EventosService } from './eventos.service'
 import { CreateEventoDto } from './dto/create-evento.dto'
@@ -32,19 +33,22 @@ export class EventosController {
 
   @Get(':id')
   @ApiOkResponse({ type: EventoEntity })
-  findOne(@Param('id') id: string) {
-    return this.eventosService.findOne(+id)
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.eventosService.findOne(id)
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: EventoEntity })
-  update(@Param('id') id: string, @Body() updateEventoDto: UpdateEventoDto) {
-    return this.eventosService.update(+id, updateEventoDto)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateEventoDto: UpdateEventoDto
+  ) {
+    return this.eventosService.update(id, updateEventoDto)
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: EventoEntity })
-  remove(@Param('id') id: string) {
-    return this.eventosService.remove(+id)
+  remove(@Param('id') id: number) {
+    return this.eventosService.remove(id)
   }
 }
