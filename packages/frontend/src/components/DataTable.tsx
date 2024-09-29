@@ -18,7 +18,8 @@ import {
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { useRouteLoaderData, Link as RouterLink } from 'react-router-dom'
-import { Local, Evento } from '../utils/getPlaceholder'
+import { Local, Evento } from '../api/types'
+
 type TableMode = 'local' | 'evento'
 
 interface Column {
@@ -45,7 +46,7 @@ const columns: Record<TableMode, Column[]> = {
   evento: [
     { field: 'nome', headerName: 'Nome' },
     { field: 'tipo', headerName: 'Tipo' },
-    { field: 'local', headerName: 'Local associado' },
+    { field: 'Local', headerName: 'Local associado' },
     { field: 'endereco', headerName: 'Endereço' },
     { field: 'entradas', headerName: 'Portões cadastrados' },
     { field: 'data', headerName: 'Data' },
@@ -76,7 +77,7 @@ const getTipoCellStyle = (tipo: string, palette: any) => {
 
 interface RowMenuProps {
   itemTipo: TableMode
-  rowData: { id: string; nome: string }
+  rowData: { id: number; nome: string }
 }
 
 const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
@@ -301,15 +302,40 @@ const TableContent: React.FC<{
                         : {}
                     }
                   >
-                    {/* combina cidade e uf para display */}
-                    {column.field === 'cidade_uf'
-                      ? 'cidade' in row
-                        ? `${row.cidade}; ${row.uf}`
-                        : ''
-                      : /* entradas é um array, virgulas para display */
-                        column.field === 'entradas'
-                        ? (row[column.field] as string[]).join(',')
-                        : row[column.field as keyof typeof row]}
+                    {(() => {
+                      if (
+                        column.field === 'cidade_uf' &&
+                        'cidade' in row &&
+                        'uf' in row
+                      ) {
+                        return `${row.cidade}; ${row.uf}`
+                      }
+                      if (column.field === 'entradas' && 'entradas' in row) {
+                        return (row.entradas as string[]).join(', ')
+                      }
+                      if (
+                        column.field === 'atualizacao' &&
+                        'atualizacao' in row
+                      ) {
+                        return new Date(row.atualizacao).toLocaleDateString()
+                      }
+                      if (column.field === 'data' && 'data_inicio' in row) {
+                        return new Date(row.data_inicio).toLocaleDateString()
+                      }
+                      if (column.field === 'Local' && 'Local' in row) {
+                        return (row.Local as Local).nome
+                      }
+                      if (column.field === 'endereco' && 'Local' in row) {
+                        return (row.Local as Local).endereco
+                      }
+                      if (column.field === 'entradas' && 'Local' in row) {
+                        return (row.Local as Local)?.entradas?.join(',') ?? ''
+                      }
+                      if (column.field in row && column.field !== 'Local') {
+                        return row[column.field as keyof typeof row]
+                      }
+                      return ''
+                    })()}
                   </Typography>
                 </TableCell>
               ))}
@@ -351,6 +377,7 @@ const DataTable: React.FC<DataTableProps> = ({
     eventos: Evento[]
   }
   const { locais, eventos } = data
+  console.log(data)
   const [paginaAtual, setPaginaAtual] = useState(1)
   const rows = tableMode === 'local' ? locais : eventos
   const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)

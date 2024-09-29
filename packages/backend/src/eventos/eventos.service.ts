@@ -13,13 +13,19 @@ export class EventosService {
   }
 
   findAll() {
-    return this.prisma.evento.findMany()
+    return this.prisma.evento.findMany({
+      include: {
+        Local: true,
+      },
+    })
   }
 
   findOne(id: number) {
     return this.prisma.evento.findUnique({
       where: { id },
-      include: { Local: true },
+      include: {
+        Local: true,
+      },
     })
   }
 
