@@ -148,6 +148,14 @@ const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
         <MoreVertIcon style={{ color: palette.supportBlue.main }} />
       </Button>
       <Menu
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'right',
+        }}
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}

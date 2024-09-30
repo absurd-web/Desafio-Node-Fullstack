@@ -146,7 +146,7 @@ function Header() {
             </Box>
             <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
               <Tooltip title="Ver opções">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <IconButton onClick={handleOpenUserMenu}>
                   <Avatar
                     sx={{
                       width: 32,

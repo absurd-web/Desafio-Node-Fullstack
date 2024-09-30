@@ -1,6 +1,7 @@
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 import Link from '@mui/material/Link'
 import useTheme from '@mui/material/styles/useTheme'
+import { Link as RouterLink } from 'react-router-dom'
 
 export default function CustomBreadcrumbs({
   tipo,
@@ -10,13 +11,14 @@ export default function CustomBreadcrumbs({
   const palette = useTheme().palette
   return (
     <Breadcrumbs aria-label="breadcrumb" style={{ color: 'primary' }}>
-      <Link underline="hover" color="primary" href="/">
+      <Link component={RouterLink} to="/" underline="hover" color="primary">
         Home
       </Link>
       <Link
+        component={RouterLink}
+        to={tipo === 'locais' ? '/locais' : '/eventos'}
         underline="hover"
         color={palette.supportBlue.main}
-        href="/material-ui/react-breadcrumbs/"
         aria-current="page"
       >
         {tipo === 'locais' ? 'Locais' : 'Eventos'}

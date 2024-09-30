@@ -19,7 +19,7 @@ interface HomeCardProps {
   title: string
   description: string
   buttonText: string
-  onButtonClick: () => void
+  linkTo: string
   palette: Palette
 }
 
@@ -37,7 +37,10 @@ const HomeTableWidget: React.FC<HomeTableWidgetProps> = ({
   palette,
 }) => {
   return (
-    <Grid sx={{ bgcolor: palette.surface.main, borderRadius: '20px' }} size={6}>
+    <Grid
+      sx={{ bgcolor: palette.surface.main, borderRadius: '20px' }}
+      size={{ xs: 12, md: 6 }}
+    >
       <Container
         sx={{
           display: 'flex',
@@ -79,11 +82,14 @@ const HomeCard: React.FC<HomeCardProps> = ({
   title,
   description,
   buttonText,
-  onButtonClick,
+  linkTo,
   palette,
 }) => {
   return (
-    <Grid sx={{ bgcolor: backgroundColor, borderRadius: '16px' }} size={6}>
+    <Grid
+      sx={{ bgcolor: backgroundColor, borderRadius: '16px' }}
+      size={{ xs: 12, md: 6 }}
+    >
       <Container
         sx={{
           display: 'flex',
@@ -104,9 +110,10 @@ const HomeCard: React.FC<HomeCardProps> = ({
           </Typography>
         </Box>
         <Button
+          component={RouterLink}
+          to={linkTo}
           variant="contained"
           disableElevation
-          onClick={onButtonClick}
           sx={{
             bgcolor: palette.onSupportBlue.main,
             color: palette.onSecondary.main,
@@ -145,7 +152,7 @@ function Home() {
         title="Locais"
         description="Confira todo os locais cadastrados!"
         buttonText="Conferir locais"
-        onButtonClick={() => console.log('Locais button clicked')}
+        linkTo="/locais"
         palette={palette}
       />
       <HomeCard
@@ -154,7 +161,7 @@ function Home() {
         title="Eventos"
         description="Confira todo os eventos cadastrados!"
         buttonText="Conferir eventos"
-        onButtonClick={() => console.log('Eventos button clicked')}
+        linkTo="/eventos"
         palette={palette}
       />
       <HomeTableWidget
