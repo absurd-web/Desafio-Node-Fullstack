@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
 import {
   IsDate,
   IsInt,
@@ -33,11 +34,13 @@ export class CreateEventoDto {
   @ApiProperty()
   local_id: number
 
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   @ApiProperty()
   data_inicio: Date
 
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   @ApiProperty()

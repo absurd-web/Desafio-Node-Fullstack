@@ -3,11 +3,11 @@ interface Evento {
   nome: string
   tipo: string
   email: string
-  telefone: string
+  telefone?: string
   local_id: number
   data_inicio: Date
   data_fim: Date
-  local: Local
+  Local: Local
 }
 
 interface Local {

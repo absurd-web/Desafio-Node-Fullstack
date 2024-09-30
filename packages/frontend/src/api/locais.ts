@@ -12,7 +12,7 @@ export const getLocal = async (id: number) => {
   return response.json()
 }
 
-export const createLocal = async (data: Omit<Local, 'id'>) => {
+export const createLocal = async (data: Omit<Local, 'id' | 'atualizacao'>) => {
   const response = await fetch('/api/locais', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -22,7 +22,10 @@ export const createLocal = async (data: Omit<Local, 'id'>) => {
   return response.json()
 }
 
-export const updateLocal = async (id: number, data: Omit<Local, 'id'>) => {
+export const updateLocal = async (
+  id: number,
+  data: Omit<Local, 'id' | 'atualizacao'>
+) => {
   const response = await fetch(`/api/locais/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

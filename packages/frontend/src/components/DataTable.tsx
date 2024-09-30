@@ -17,8 +17,15 @@ import {
   Modal,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { useRouteLoaderData, Link as RouterLink } from 'react-router-dom'
+import {
+  useRouteLoaderData,
+  Link as RouterLink,
+  useNavigate,
+} from 'react-router-dom'
 import { Local, Evento } from '../api/types'
+import { deleteLocal } from '../api/locais'
+import { useSnackbar } from '../contexts/SnackbarContext'
+import { deleteEvento } from '../api/eventos'
 
 type TableMode = 'local' | 'evento'
 
@@ -83,7 +90,41 @@ interface RowMenuProps {
 const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openModal, setOpenModal] = useState(false)
+  const { showSnackbar } = useSnackbar()
   const { palette } = useTheme()
+  const navigate = useNavigate()
+
+  const deleteItem = async () => {
+    if (itemTipo === 'local') {
+      try {
+        await deleteLocal(rowData.id)
+        handleCloseModal()
+        showSnackbar(
+          'Sucesso',
+          `o local "${rowData.nome}" foi apagado`,
+          'success'
+        )
+        navigate(`/locais`, { replace: true })
+      } catch (error) {
+        showSnackbar('Erro', 'não foi possível apagar o local', 'error')
+        console.error(error)
+      }
+    } else {
+      try {
+        await deleteEvento(rowData.id)
+        handleCloseModal()
+        showSnackbar(
+          'Sucesso',
+          `o evento "${rowData.nome}" foi apagado`,
+          'success'
+        )
+        navigate(`/eventos`, { replace: true })
+      } catch (error) {
+        showSnackbar('Erro', 'não foi possível apagar o evento', 'error')
+        console.error(error)
+      }
+    }
+  }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -171,7 +212,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
               Apagar evento
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Você tem certeza que deseja apagar o evento{' '}
+              Você tem certeza que deseja apagar o evento
               <em>"{rowData.nome}"</em>?
             </Typography>
             <Box
@@ -192,7 +233,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ itemTipo, rowData }) => {
               <Button
                 disableElevation
                 variant="contained"
-                onClick={handleCloseModal}
+                onClick={deleteItem}
                 sx={{
                   textTransform: 'none',
                   color: palette.onPrimary.main,
@@ -377,7 +418,6 @@ const DataTable: React.FC<DataTableProps> = ({
     eventos: Evento[]
   }
   const { locais, eventos } = data
-  console.log(data)
   const [paginaAtual, setPaginaAtual] = useState(1)
   const rows = tableMode === 'local' ? locais : eventos
   const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)

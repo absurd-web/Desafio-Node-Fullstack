@@ -11,24 +11,12 @@ import GridLayout from './components/GridLayout.tsx'
 import Home from './routes/Home.tsx'
 import Eventos from './routes/Eventos.tsx'
 import Locais from './routes/Locais.tsx'
-import AddEditLayout from './components/AddEditLayout.tsx'
 import { SnackbarProvider } from './contexts/SnackbarContext.tsx'
-import {
-  getLocal,
-  getLocais,
-  createLocal,
-  updateLocal,
-  deleteLocal,
-} from './api/locais.ts'
-import {
-  getEvento,
-  getEventos,
-  createEvento,
-  updateEvento,
-  deleteEvento,
-} from './api/eventos.ts'
-import { getPlaceholder, getPlaceholderItem } from './utils/getPlaceholder.ts'
+import { getLocal, getLocais } from './api/locais.ts'
+import { getEvento, getEventos } from './api/eventos.ts'
 import type { LoaderFunctionArgs } from 'react-router-dom'
+import EventoForm from './components/EventoForm.tsx'
+import LocalForm from './components/LocalForm.tsx'
 
 async function allItemsLoader() {
   const locais = await getLocais()
@@ -36,13 +24,13 @@ async function allItemsLoader() {
   return { locais, eventos }
 }
 
-async function placeholderLocalLoader({ params }: LoaderFunctionArgs) {
-  const item = getPlaceholderItem(params.id as string, 'local')
+async function getLocalLoader({ params }: LoaderFunctionArgs) {
+  const item = await getLocal(Number(params.id))
   return item
 }
 
-async function placeholderEventoLoader({ params }: LoaderFunctionArgs) {
-  const item = getPlaceholderItem(params.id as string, 'evento')
+async function getEventoLoader({ params }: LoaderFunctionArgs) {
+  const item = await getEvento(Number(params.id))
   return item
 }
 
@@ -126,21 +114,21 @@ const router = createBrowserRouter([
       },
       {
         path: 'eventos/add',
-        element: <AddEditLayout itemTipo="eventos" />,
+        element: <EventoForm />,
       },
       {
         path: 'locais/add',
-        element: <AddEditLayout itemTipo="locais" />,
+        element: <LocalForm />,
       },
       {
         path: 'eventos/edit/:id',
-        element: <AddEditLayout itemTipo="eventos" />,
-        loader: placeholderEventoLoader,
+        element: <EventoForm />,
+        loader: getEventoLoader,
       },
       {
         path: 'locais/edit/:id',
-        element: <AddEditLayout itemTipo="locais" />,
-        loader: placeholderLocalLoader,
+        element: <LocalForm />,
+        loader: getLocalLoader,
       },
     ],
   },
