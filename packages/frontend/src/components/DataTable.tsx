@@ -427,7 +427,10 @@ const DataTable: React.FC<DataTableProps> = ({
   }
   const { locais, eventos } = data
   const [paginaAtual, setPaginaAtual] = useState(1)
-  const rows = tableMode === 'local' ? locais : eventos
+  const rows =
+    tableMode === 'local'
+      ? [...locais].sort((a, b) => a.id - b.id)
+      : [...eventos].sort((a, b) => a.id - b.id)
   const totalPaginas = Math.ceil(rows.length / ROWS_POR_PAGINA)
   /* Pesquisa por nome */
   const regex = searchQuery ? new RegExp(searchQuery, 'i') : null
@@ -452,7 +455,7 @@ const DataTable: React.FC<DataTableProps> = ({
         </Typography>
       )}
       <TableContent
-        rows={simple ? rows.slice(0, 3) : rowsPaginados}
+        rows={simple ? [...rows].reverse().slice(0, 3) : rowsPaginados}
         columns={columns[tableMode]}
         tableMode={tableMode}
         simple={simple}

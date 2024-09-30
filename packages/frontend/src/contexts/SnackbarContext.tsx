@@ -67,7 +67,7 @@ export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
         autoHideDuration={3000}
         onClose={handleClose}
         sx={{
-          width: '30%',
+          minWidth: '30%',
         }}
       >
         <Alert

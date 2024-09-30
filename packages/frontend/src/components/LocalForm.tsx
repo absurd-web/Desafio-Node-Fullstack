@@ -222,14 +222,14 @@ export default function LocalForm() {
   return (
     <Grid component="main" container spacing={3} size={12}>
       <Grid size={3}></Grid>
-      <Grid container size={6}>
+      <Grid container size={{ xs: 12, md: 6 }}>
         <Grid size={12}>
           <CustomBreadcrumbs tipo="locais" />
         </Grid>
         <Grid size={12}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Typography variant="h5" color="primary">
-              Adicionar novo local
+              {isEditMode ? 'Editar local' : 'Adicionar novo local'}
             </Typography>
             <Typography color="primary" sx={{ fontSize: '14px' }}>
               *Campos obrigatórios
@@ -253,7 +253,7 @@ export default function LocalForm() {
               <Grid size={12}>
                 <Typography color="primary">Informações básicas</Typography>
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoNome"
                   defaultValue=""
@@ -282,7 +282,7 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <InputLabel htmlFor="novo-apelido">
                   <Typography color="primary">Apelido</Typography>
                 </InputLabel>
@@ -292,7 +292,7 @@ export default function LocalForm() {
                   {...register('novoApelido')}
                 ></Input>
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoTipo"
                   control={control}
@@ -358,7 +358,7 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <InputLabel htmlFor="novo-cnpj">
                   <Typography color="primary">CNPJ</Typography>
                 </InputLabel>
@@ -376,7 +376,7 @@ export default function LocalForm() {
               <Grid size={12}>
                 <Typography color="primary">Localização</Typography>
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoCidade"
                   defaultValue=""
@@ -405,7 +405,7 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoEstado"
                   control={control}
@@ -463,7 +463,7 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoCep"
                   defaultValue=""
@@ -494,7 +494,7 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoEndereco"
                   defaultValue=""
@@ -523,7 +523,7 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <InputLabel htmlFor="novo-complemento">
                   <Typography color="primary">Complemento</Typography>
                 </InputLabel>
@@ -539,7 +539,7 @@ export default function LocalForm() {
               <Grid size={12}>
                 <Typography color="primary">Contato</Typography>
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoEmail"
                   defaultValue=""
@@ -575,17 +575,40 @@ export default function LocalForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-telefone">
-                  <Typography color="primary">Telefone</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-telefone"
-                  placeholder="Informe um telefone"
-                  inputComponent={MaskedInput}
-                  inputProps={{ mask: '(00) 00000-0000' }}
-                  {...register('novoTelefone')}
-                ></Input>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Controller
+                  name="novoTelefone"
+                  control={control}
+                  rules={{
+                    pattern: {
+                      value: /^\(\d{2}\) \d{5}-\d{4}$/,
+                      message: 'Telefone inválido',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-telefone">
+                        <Typography color="primary">Telefone</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-telefone"
+                        placeholder="Informe um telefone"
+                        inputComponent={MaskedInput}
+                        inputProps={{ mask: '(00) 00000-0000' }}
+                        error={!!errors.novoTelefone}
+                      />
+                      {errors.novoTelefone && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoTelefone.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
@@ -596,7 +619,7 @@ export default function LocalForm() {
                 </Typography>
               </Grid>
               {['entrada', 'catraca'].map((itemType) => (
-                <Grid size={6} key={itemType}>
+                <Grid size={{ xs: 12, md: 6 }} key={itemType}>
                   <InputLabel htmlFor={`novo-${itemType}s`}>
                     <Typography color="primary">{`Cadastre as ${itemType}s`}</Typography>
                   </InputLabel>
@@ -692,7 +715,7 @@ export default function LocalForm() {
                     sx={{ textTransform: 'none', radius: '6px', px: 4 }}
                   >
                     <Typography color={palette.onPrimary.main}>
-                      Cadastrar
+                      {isEditMode ? 'Atualizar' : 'Cadastrar'}
                     </Typography>
                   </Button>
                 </Box>
