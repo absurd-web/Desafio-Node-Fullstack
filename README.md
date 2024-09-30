@@ -1,3 +1,59 @@
+# Instruções para rodar projeto localmente
+
+## Prerequisitos
+
+- Node.js
+- pnpm
+- PostgreSQL
+
+## Setup
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/absurd-web/Desafio-Node-Fullstack
+cd Desafio-Node-Fullstack
+```
+
+### 2. Instale as dependências
+
+```bash
+pnpm install
+```
+
+### 3. Faça o setup do banco de dados
+
+- Crie um banco de dados PostgreSQL para o projeto
+
+### 4. Configure o arquivo .env
+
+Crie um arquivo `.env` na pasta `backend` com o seguinte conteúdo:
+
+```
+DATABASE_URL="postgresql://username:password@localhost:5432/seu_nome_do_banco"
+```
+
+### 5. Execute as migrações do banco de dados
+
+```bash
+cd backend
+pnpm run prisma migrate dev
+```
+
+### 6. Inicie os servidores
+
+```bash
+# no root da aplicação
+pnpm run dev
+# vai iniciar o frontend e o backend em paralelo
+```
+
+O backend então deve começar a rodar em `http://localhost:3000` e o frontend em `http://localhost:5173`.
+
+# Diagrama do banco de dados
+
+<img title="diagrama" alt="diagrama" src="diagrama.png">
+
 <p align="center">
   <img title="a title" alt="Alt text" src="https://media.licdn.com/dms/image/D4E16AQGjCVuzlCthvg/profile-displaybackgroundimage-shrink_200_800/0/1690574706700?e=2147483647&v=beta&t=zlY1Mc10yQ3gA9qiZ4sZ7m8PkE-HIu8Haa1fUyKb_fU">
 </p>
