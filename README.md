@@ -50,7 +50,7 @@ pnpm run dev
 # vai iniciar o frontend e o backend em paralelo
 ```
 
-O backend então deve começar a rodar em `http://localhost:3000` e o frontend em `http://localhost:5173`.
+O backend então deve começar a rodar em `http://localhost:3000` (Swagger em `http://localhost:3000/api` ) e o frontend em `http://localhost:5173`.
 
 # Diagrama do banco de dados
 
