@@ -30,6 +30,8 @@ import {
 import { createEvento, updateEvento } from '../api/eventos'
 import { Local, Evento } from '../api/types'
 
+import '../styles/FormLayout.css'
+
 interface MaskedInputProps extends InputBaseComponentProps {
   mask: string
   name: string
@@ -73,7 +75,6 @@ export default function EventoForm() {
   // Hooks do react-hook-form para gerenciar o formulário
   const {
     control,
-    register,
     handleSubmit,
     reset,
     setValue,
@@ -163,14 +164,14 @@ export default function EventoForm() {
   return (
     <Grid component="main" container spacing={3} size={12}>
       <Grid size={3}></Grid>
-      <Grid container size={6}>
+      <Grid container size={{ xs: 12, md: 6 }}>
         <Grid size={12}>
           <CustomBreadcrumbs tipo="eventos" />
         </Grid>
         <Grid size={12}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Typography variant="h5" color="primary">
-              Adicionar novo evento
+              {isEditMode ? 'Editar evento' : 'Adicionar novo evento'}
             </Typography>
             <Typography color="primary" sx={{ fontSize: '14px' }}>
               *Campos obrigatórios
@@ -194,7 +195,7 @@ export default function EventoForm() {
               <Grid size={12}>
                 <Typography color="primary">Informações básicas</Typography>
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoNome"
                   defaultValue=""
@@ -223,7 +224,7 @@ export default function EventoForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoTipo"
                   control={control}
@@ -283,7 +284,7 @@ export default function EventoForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoData"
                   defaultValue=""
@@ -320,7 +321,7 @@ export default function EventoForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoHorario"
                   defaultValue=""
@@ -359,7 +360,7 @@ export default function EventoForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoLocalAssoc"
                   control={control}
@@ -415,17 +416,29 @@ export default function EventoForm() {
                           {errors.novoLocalAssoc.message}
                         </FormHelperText>
                       )}
+                      <FormHelperText
+                        component={RouterLink}
+                        to={`/locais/add`}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'end',
+                          textDecoration: 'none',
+                          color: palette.skyBlue.main,
+                        }}
+                      >
+                        Cadastrar local
+                      </FormHelperText>
                     </>
                   )}
                 />
               </Grid>
               <Grid size={12}>
-                <Divider variant="middle" color={palette.onPrimary.main} />
+                <Divider variant="middle" />
               </Grid>
               <Grid size={12}>
                 <Typography color="primary">Contato</Typography>
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="novoEmail"
                   defaultValue=""
@@ -461,17 +474,40 @@ export default function EventoForm() {
                   )}
                 />
               </Grid>
-              <Grid size={6}>
-                <InputLabel htmlFor="novo-telefone">
-                  <Typography color="primary">Telefone</Typography>
-                </InputLabel>
-                <Input
-                  id="novo-telefone"
-                  placeholder="Informe um telefone"
-                  inputComponent={MaskedInput}
-                  inputProps={{ mask: '(00) 00000-0000' }}
-                  {...register('novoTelefone')}
-                ></Input>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Controller
+                  name="novoTelefone"
+                  control={control}
+                  rules={{
+                    pattern: {
+                      value: /^\(\d{2}\) \d{5}-\d{4}$/,
+                      message: 'Telefone inválido',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <>
+                      <InputLabel htmlFor="novo-telefone">
+                        <Typography color="primary">Telefone</Typography>
+                      </InputLabel>
+                      <Input
+                        {...field}
+                        id="novo-telefone"
+                        placeholder="Informe um telefone"
+                        inputComponent={MaskedInput}
+                        inputProps={{ mask: '(00) 00000-0000' }}
+                        error={!!errors.novoTelefone}
+                      />
+                      {errors.novoTelefone && (
+                        <FormHelperText
+                          sx={{ display: 'flex', justifyContent: 'end' }}
+                          error
+                        >
+                          {errors.novoTelefone.message}
+                        </FormHelperText>
+                      )}
+                    </>
+                  )}
+                />
               </Grid>
               <Grid size={12}>
                 <Divider variant="middle" color={palette.onPrimary.main} />
@@ -492,7 +528,7 @@ export default function EventoForm() {
                     sx={{ textTransform: 'none', radius: '6px', px: 4 }}
                   >
                     <Typography color={palette.onPrimary.main}>
-                      Cadastrar
+                      {isEditMode ? 'Atualizar' : 'Cadastrar'}
                     </Typography>
                   </Button>
                 </Box>
