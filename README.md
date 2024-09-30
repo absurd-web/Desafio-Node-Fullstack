@@ -52,7 +52,7 @@ O backend então deve começar a rodar em `http://localhost:3000` e o frontend e
 
 # Diagrama do banco de dados
 
-<img title="diagrama" alt="diagrama" src="diagrama.png">
+<img title="diagrama" alt="diagrama" src="diagrama.png" width="265" height="960">
 
 <p align="center">
   <img title="a title" alt="Alt text" src="https://media.licdn.com/dms/image/D4E16AQGjCVuzlCthvg/profile-displaybackgroundimage-shrink_200_800/0/1690574706700?e=2147483647&v=beta&t=zlY1Mc10yQ3gA9qiZ4sZ7m8PkE-HIu8Haa1fUyKb_fU">
