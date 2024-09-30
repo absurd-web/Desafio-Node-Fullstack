@@ -15,7 +15,7 @@ Desenvolver uma aplicação frontend para gerenciar um sistema de gerenciamento 
 1. Os locais terão diferentes entradas/portões e o acesso às catracas diferem pelo tipo de ingresso.
 2. Os eventos deverão estar sempre associados a um local.
 3. Eventos deverão ter data e horário de início e fim.
-4. Um local não pode receber mais de um evento no mesmo horário, assim como um evento não ocorre em 2 locais ao mesmo tempo. 
+4. Um local não pode receber mais de um evento no mesmo horário, assim como um evento não ocorre em 2 locais ao mesmo tempo.
 
 # Desafio Frontend | ReactJS
 
@@ -40,7 +40,7 @@ Desenvolver uma aplicação frontend para gerenciar um sistema de gerenciamento 
 3. Uso de um linter (como ESLint) e formatador de código (como Prettier).
 4. Implementação de funcionalidades adicionais como busca, filtros e ordenação.
 5. Deploy da aplicação (pode usar Vercel, Netlify, etc.)
-    
+
 ## 🗳️ Instruções de Submissão:
 
 1. Faça um fork deste repositório para sua conta pessoal do GitHub.
@@ -75,7 +75,7 @@ Desenvolver uma aplicação frontend para gerenciar um sistema de gerenciamento 
 
 - Com base nas telas propostas no Figma abaixo, modele o banco de dados utilizando a ferramenta que preferir.
 - Lembre de adicionar ao seu repositório o link ou imagem da modelagem.
-  
+
 [Figma](https://www.figma.com/file/ztqsEQWF8BXskx8UerVztk/OnEntree---Desafio-Fullstack?type=design&node-id=13%3A156&mode=design&t=2b29VVsfWoTXCOsS-1)
 
 ### 4. Validações e Erros:
