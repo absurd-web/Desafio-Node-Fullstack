@@ -27,17 +27,19 @@ pnpm install
 
 ### 4. Configure o arquivo .env
 
-Crie um arquivo `.env` na pasta `backend` com o seguinte conteúdo:
+Crie um arquivo `.env` na pasta `packages/backend` com o seguinte conteúdo:
 
 ```
 DATABASE_URL="postgresql://username:password@localhost:5432/seu_nome_do_banco"
 ```
 
-### 5. Execute as migrações do banco de dados
+### 5. Execute as migrações do banco de dados e seeding
 
 ```bash
-cd backend
-pnpm run prisma migrate dev
+cd .\packages\backend\
+npx prisma migrate dev
+#seed
+npx prisma db seed
 ```
 
 ### 6. Inicie os servidores
